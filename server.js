@@ -1,36 +1,48 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
-const MongoStore = require('connect-mongo'); // Add this
+const MongoStore = require('connect-mongo');
 const path = require('path');
 const app = express();
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/nbapool')
-  .then(() => {
-      console.log('Connected to MongoDB');
-  })
-  .catch(err => {
-      console.error('MongoDB connection error:', err);
-  });
+const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/nbapool';
+mongoose.connect(mongoUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch(err => {
+        console.error('MongoDB connection error:', err);
+    });
 
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Session Middleware
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }), // Store sessions in MongoDB
+    store: MongoStore.create({
+        mongoUrl: mongoUrl, // Use the same MongoDB URL as Mongoose
+        ttl: 24 * 60 * 60, // Session TTL of 24 hours (in seconds)
+        autoRemove: 'native' // Automatically remove expired sessions
+    }),
     cookie: { 
         secure: process.env.NODE_ENV === 'production', // Secure cookies in production (HTTPS)
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        httpOnly: true, // Prevent client-side access to the cookie
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Cross-site cookies in production, lax in development
     }
 }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-    console.log(`[${req.method}] ${req.url} - Session ID: ${req.sessionID}, UserId: ${req.session.userId}`);
+    console.log(`[${req.method}] ${req.url} - Session ID: ${req.sessionID || 'none'}, UserId: ${req.session.userId || 'undefined'}, Cookie: ${req.headers.cookie || 'none'}`);
     next();
 });
 
@@ -60,8 +72,10 @@ app.get('/', (req, res) => {
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
+            console.error('Error destroying session:', err);
             return res.status(500).json({ error: 'Logout failed' });
         }
+        res.clearCookie('connect.sid'); // Clear the session cookie
         res.redirect('/');
     });
 });
@@ -95,9 +109,15 @@ app.post('/submit-registration', async (req, res) => {
         });
 
         await user.save();
-        req.session.userId = user._id;
-        console.log(`User saved with ID: ${user._id}`);
-        res.json({ message: 'Registration successful' });
+        req.session.userId = user._id; // Set the userId in the session
+        req.session.save((err) => {
+            if (err) {
+                console.error('Error saving session after registration:', err);
+                return res.status(500).json({ error: 'Error saving session' });
+            }
+            console.log(`User saved with ID: ${user._id}, Session ID: ${req.sessionID}, Saved UserId: ${req.session.userId}`);
+            res.json({ message: 'Registration successful' });
+        });
     } catch (error) {
         console.error('Error saving user:', error);
         res.status(500).json({ error: 'Internal Server Error: ' + error.message });
