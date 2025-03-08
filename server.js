@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoStore = require('connect-mongo'); // Add this
 const path = require('path');
 const app = express();
 
@@ -15,12 +16,16 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/nbapool')
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public'))); // Serves static files from 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }), // Store sessions in MongoDB
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production', // Secure cookies in production (HTTPS)
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }));
 
 // Request logging middleware
@@ -50,6 +55,15 @@ const User = mongoose.model('User', userSchema);
 // Routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ error: 'Logout failed' });
+        }
+        res.redirect('/');
+    });
 });
 
 app.post('/submit-registration', async (req, res) => {
@@ -132,6 +146,78 @@ app.get('/get-playin', async (req, res) => {
         res.json(user.playin);
     } catch (error) {
         console.error('Error fetching Play-In data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/get-firstround-east', async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const user = await User.findById(req.session.userId);
+        if (!user || !user.firstRoundEast) {
+            return res.json({});
+        }
+
+        res.json(user.firstRoundEast);
+    } catch (error) {
+        console.error('Error fetching First Round East data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/get-firstround-west', async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const user = await User.findById(req.session.userId);
+        if (!user || !user.firstRoundWest) {
+            return res.json({});
+        }
+
+        res.json(user.firstRoundWest);
+    } catch (error) {
+        console.error('Error fetching First Round West data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/get-semifinals', async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const user = await User.findById(req.session.userId);
+        if (!user || !user.semifinals) {
+            return res.json({});
+        }
+
+        res.json(user.semifinals);
+    } catch (error) {
+        console.error('Error fetching Semifinals data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/get-conferencefinals', async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const user = await User.findById(req.session.userId);
+        if (!user || !user.conferenceFinals) {
+            return res.json({});
+        }
+
+        res.json(user.conferenceFinals);
+    } catch (error) {
+        console.error('Error fetching Conference Finals data:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
