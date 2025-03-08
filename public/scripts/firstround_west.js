@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/playin.html';
                 return;
             }
-            populateWinners();
+            populateMatchups(data);
         })
         .catch(error => {
             console.error('Error fetching Play-In data:', error);
@@ -21,15 +21,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
-function populateWinners() {
+function populateMatchups(playinData) {
+    const teamLogos = {
+        'Lakers': '/images/lakers.png',
+        'Warriors': '/images/warriors.png',
+        'Pelicans': '/images/pelicans.png',
+        'Jazz': '/images/jazz.png',
+        'Kings': '/images/kings.png',
+        'Spurs': '/images/spurs.png'
+        // Add more teams as needed
+    };
+
     const matchups = [
-        { id: 'match1-winner', teams: ['Lakers', 'Pelicans'] },
-        { id: 'match2-winner', teams: ['Nuggets', 'Timberwolves'] },
-        { id: 'match3-winner', teams: ['Warriors', 'Clippers'] },
-        { id: 'match4-winner', teams: ['Suns', 'Mavericks'] }
+        { id: 'match1-winner', teams: ['Nuggets', playinData.west7] },
+        { id: 'match2-winner', teams: ['Suns', playinData.west8] },
+        { id: 'match3-winner', teams: ['Warriors', 'Mavericks'] },
+        { id: 'match4-winner', teams: ['Lakers', 'Clippers'] }
     ];
 
-    console.log('Populating winners for matchups:', matchups);
+    // Update logos for dynamic teams
+    document.getElementById('west7-logo').src = teamLogos[playinData.west7] || '/images/default.png';
+    document.getElementById('west7-logo').alt = `${playinData.west7} Logo`;
+    document.getElementById('west8-logo').src = teamLogos[playinData.west8] || '/images/default.png';
+    document.getElementById('west8-logo').alt = `${playinData.west8} Logo`;
+
+    console.log('Populating matchups:', matchups);
     matchups.forEach(matchup => {
         const select = document.getElementById(matchup.id);
         if (select) {
@@ -76,7 +92,7 @@ function submitFirstRoundWest() {
             alert('Error: ' + data.error);
         } else {
             alert('First Round West submitted successfully!');
-            window.location.href = '/semifinals.html'; // Next step in sequence
+            window.location.href = '/semifinals.html';
         }
     })
     .catch(error => {

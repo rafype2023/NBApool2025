@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/playin.html';
                 return;
             }
-            populateWinners();
+            populateMatchups(data);
         })
         .catch(error => {
             console.error('Error fetching Play-In data:', error);
@@ -21,15 +21,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
-function populateWinners() {
+function populateMatchups(playinData) {
+    const teamLogos = {
+        'Hawks': '/images/hawks.png',
+        'Bulls': '/images/bulls.png',
+        'Hornets': '/images/hornets.png',
+        'Wizards': '/images/wizards.png',
+        'Nets': '/images/nets.png',
+        'Raptors': '/images/raptors.png'
+        // Add more teams as needed
+    };
+
     const matchups = [
-        { id: 'match1-winner', teams: ['Hawks', 'Knicks'] },
-        { id: 'match2-winner', teams: ['Celtics', 'Heat'] },
-        { id: 'match3-winner', teams: ['Bucks', 'Pacers'] },
-        { id: 'match4-winner', teams: ['Sixers', 'Cavaliers'] }
+        { id: 'match1-winner', teams: ['Bucks', playinData.east7] },
+        { id: 'match2-winner', teams: ['Heat', playinData.east8] },
+        { id: 'match3-winner', teams: ['Celtics', 'Pacers'] },
+        { id: 'match4-winner', teams: ['Knicks', 'Sixers'] }
     ];
 
-    console.log('Populating winners for matchups:', matchups);
+    // Update logos for dynamic teams
+    document.getElementById('east7-logo').src = teamLogos[playinData.east7] || '/images/default.png';
+    document.getElementById('east7-logo').alt = `${playinData.east7} Logo`;
+    document.getElementById('east8-logo').src = teamLogos[playinData.east8] || '/images/default.png';
+    document.getElementById('east8-logo').alt = `${playinData.east8} Logo`;
+
+    console.log('Populating matchups:', matchups);
     matchups.forEach(matchup => {
         const select = document.getElementById(matchup.id);
         if (select) {
@@ -64,7 +80,7 @@ function submitFirstRoundEast() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ firstRoundEast: winners }) // Changed to firstRoundEast to distinguish from West
+        body: JSON.stringify({ firstRoundEast: winners })
     })
     .then(response => {
         console.log('Fetch /submit-firstround-east response status:', response.status);
@@ -76,7 +92,7 @@ function submitFirstRoundEast() {
             alert('Error: ' + data.error);
         } else {
             alert('First Round East submitted successfully!');
-            window.location.href = '/firstround_west.html'; // Updated to First Round West
+            window.location.href = '/firstround_west.html';
         }
     })
     .catch(error => {
