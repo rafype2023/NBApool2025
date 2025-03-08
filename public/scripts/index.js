@@ -1,23 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Registration page loaded');
-    document.getElementById('registration-form').addEventListener('submit', submitRegistration);
+    const registrationForm = document.getElementById('registration-form');
+    if (!registrationForm) {
+        console.error('Registration form not found. Ensure the form has id="registration-form".');
+        alert('An error occurred: Registration form not found. Please refresh the page or contact support.');
+        return;
+    }
+
+    registrationForm.addEventListener('submit', submitRegistration);
 });
 
 function submitRegistration(event) {
     event.preventDefault();
 
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const comments = document.getElementById('comments').value;
-    const paymentMethod = document.getElementById('payment-method').value;
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const commentsInput = document.getElementById('comments');
+    const paymentMethodSelect = document.getElementById('paymentMethod');
+
+    // Check if all required elements exist
+    if (!nameInput || !emailInput || !phoneInput || !paymentMethodSelect) {
+        console.error('One or more form fields are missing. Check IDs: name, email, phone, paymentMethod.');
+        alert('An error occurred: Form fields are missing. Please refresh the page or contact support.');
+        return;
+    }
 
     const userData = {
-        name,
-        email,
-        phone,
-        comments,
-        paymentMethod
+        name: nameInput.value,
+        email: emailInput.value,
+        phone: phoneInput.value,
+        comments: commentsInput ? commentsInput.value : '',
+        paymentMethod: paymentMethodSelect.value
     };
 
     console.log('Submitting registration:', userData);
@@ -31,6 +45,9 @@ function submitRegistration(event) {
     })
     .then(response => {
         console.log('Fetch /submit-registration response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
         return response.json();
     })
     .then(data => {
@@ -44,6 +61,6 @@ function submitRegistration(event) {
     })
     .catch(error => {
         console.error('Error submitting registration:', error);
-        alert('An error occurred. Please try again.');
+        alert('An error occurred while submitting the registration. Please try again or contact support.');
     });
 }
