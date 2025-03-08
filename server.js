@@ -18,12 +18,11 @@ mongoose.connect('mongodb://localhost:27017/nbapool', {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Serves static files from 'public' directory
 app.use(session({
-    secret: 'your-secret-key',
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
 }));
-
 // Request logging middleware
 app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.url} - Session ID: ${req.sessionID}, UserId: ${req.session.userId}`);
