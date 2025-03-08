@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pool NBA 2025 - Conference Finals</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <div class="header">
+        <img src="/images/nba-pool-logo.png" alt="Pool NBA Logo" class="logo">
+        <h1>BIENVENIDOS AL <span>POOL NBA</span> 2025</h1>
+    </div>
+
+    <div class="container">
+        <h2>CONFERENCE FINALS</h2>
+        <h3>EASTERN CONFERENCE</h3>
+        <div class="matchup">
+            <img src="/images/hawks.png" alt="Hawks Logo">
+            <span>vs.</span>
+            <img src="/images/bucks.png" alt="Bucks Logo">
+            <select id="east-final-winner" name="east-final-winner" class="winner-select" required>
+                <option value="" disabled selected>Select WINNER</option>
+            </select>
+        </div>
+
+        <h3>WESTERN CONFERENCE</h3>
+        <div class="matchup">
+            <img src="/images/lakers.png" alt="Lakers Logo">
+            <span>vs.</span>
+            <img src="/images/warriors.png" alt="Warriors Logo">
+            <select id="west-final-winner" name="west-final-winner" class="winner-select" required>
+                <option value="" disabled selected>Select WINNER</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button onclick="window.location.href='/semifinals.html';">Previous</button>
+            <button onclick="submitConferenceFinals()">Next</button>
+        </div>
+    </div>
+
+    <script src="/scripts/conferencefinals.js"></script>
+</body>
+</html>

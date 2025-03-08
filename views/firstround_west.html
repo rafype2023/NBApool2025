@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pool NBA 2025 - First Round West</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <div class="header">
+        <img src="/images/nba-pool-logo.png" alt="Pool NBA Logo" class="logo">
+        <h1>BIENVENIDOS AL <span>POOL NBA</span> 2025</h1>
+    </div>
+
+    <div class="container">
+        <h2>FIRST ROUND</h2>
+        <h3>WESTERN CONFERENCE</h3>
+        <div class="matchup">
+            <img src="/images/lakers.png" alt="Lakers Logo">
+            <span>vs.</span>
+            <img src="/images/pelicans.png" alt="Pelicans Logo">
+            <select id="match1-winner" name="match1-winner" class="winner-select" required>
+                <option value="" disabled selected>Select WINNER</option>
+            </select>
+        </div>
+        <div class="matchup">
+            <img src="/images/nuggets.png" alt="Nuggets Logo">
+            <span>vs.</span>
+            <img src="/images/timberwolves.png" alt="Timberwolves Logo">
+            <select id="match2-winner" name="match2-winner" class="winner-select" required>
+                <option value="" disabled selected>Select WINNER</option>
+            </select>
+        </div>
+        <div class="matchup">
+            <img src="/images/warriors.png" alt="Warriors Logo">
+            <span>vs.</span>
+            <img src="/images/clippers.png" alt="Clippers Logo">
+            <select id="match3-winner" name="match3-winner" class="winner-select" required>
+                <option value="" disabled selected>Select WINNER</option>
+            </select>
+        </div>
+        <div class="matchup">
+            <img src="/images/suns.png" alt="Suns Logo">
+            <span>vs.</span>
+            <img src="/images/mavericks.png" alt="Mavericks Logo">
+            <select id="match4-winner" name="match4-winner" class="winner-select" required>
+                <option value="" disabled selected>Select WINNER</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button onclick="window.location.href='/firstround_east.html';">Previous</button>
+            <button onclick="submitFirstRoundWest()">Next</button>
+        </div>
+    </div>
+
+    <script src="/scripts/firstround_west.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pool NBA 2025 - Play-In</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <div class="header">
+        <img src="/images/nba-pool-logo.png" alt="Pool NBA Logo" class="logo">
+        <h1>BIENVENIDOS AL <span>POOL NBA</span> 2025</h1>
+    </div>
+
+    <div class="container">
+        <h2>Step 2 of 7</h2>
+        <h3>PLAY-IN TOURNAMENT SELECTION</h3>
+        <h4>EASTERN CONFERENCE PLAY-IN:</h4>
+        <div class="form-group">
+            <select id="east7" name="east7" required>
+                <option value="" disabled selected>Select No. 7 Seed</option>
+            </select>
+            <select id="east8" name="east8" required>
+                <option value="" disabled selected>Select No. 8 Seed</option>
+            </select>
+        </div>
+
+        <h4>WESTERN CONFERENCE PLAY-IN:</h4>
+        <div class="form-group">
+            <select id="west7" name="west7" required>
+                <option value="" disabled selected>Select No. 7 Seed</option>
+            </select>
+            <select id="west8" name="west8" required>
+                <option value="" disabled selected>Select No. 8 Seed</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button onclick="window.location.href='/';">Previous</button>
+            <button onclick="submitPlayin()">Next</button>
+        </div>
+    </div>
+
+    <script src="/scripts/playin.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pool NBA 2025 - Registro</title>
+    <link rel="stylesheet" href="/styles/styles.css"> <!-- [Updated] Stylesheet path -->
+</head>
+<body>
+    <div class="header">
+        <img src="/images/nba-pool-logo.png" alt="Pool NBA Logo" class="logo">
+        <h1>BIENVENIDOS AL <span>POOL NBA</span> 2025</h1>
+    </div>
+
+    <div class="container">
+        <div class="rules">
+            <h3>Reglas de puntuación</h3>
+            <p>PRIMERA RONDA: 1 pt para el ganador, 1 pt para los juegos (máximo 2 por partido)</p>
+            <p>SEMIFINALES: 2 puntos para el ganador, 1 punto para los juegos (máximo 3 por enfrentamiento)</p>
+            <p>FINALES DE LA CONFERENCIA: 3 puntos para el ganador, 1 punto para los juegos (máximo 4 por partido)</p>
+            <p>FINALES: 4 puntos para el ganador, 3 puntos para los juegos, 1 punto para el MVP (máximo 8)</p>
+        </div>
+
+        <h2>REGISTRO</h2>
+        <div class="form-group">
+            <input type="text" id="name" name="name" placeholder="Name" required autocomplete="name">
+            <input type="email" id="email" name="email" placeholder="Email" required autocomplete="email">
+            <input type="tel" id="phone" name="phone" placeholder="Phone" required autocomplete="tel">
+            <input type="text" id="comments" name="comments" placeholder="Comments (optional)" autocomplete="off">
+            <select id="paymentMethod" name="paymentMethod" required>
+                <option value="" disabled selected>Select Payment Method</option>
+                <option value="ATH-Movil">ATH-Movil</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Cash">Cash</option>
+            </select>
+        </div>
+        <button>Next</button> <!-- [Updated] Removed onclick attribute -->
+    </div>
+
+    <script src="/scripts/index.js"></script> <!-- [Updated] Script path -->
+</body>
+</html>
