@@ -53,9 +53,9 @@ function fetchUserPicks() {
         document.getElementById('finals-finals-winner').textContent = data.finals['finals-winner'] || 'Not selected';
         document.getElementById('finals-finals-games').textContent = data.finals['finals-games'] || 'Not selected';
         document.getElementById('finals-finals-mvp').textContent = data.finals['finals-mvp'] || 'Not selected';
-        const hawksScore = data.finals['finals-score-hawks'] || 'N/A';
-        const lakersScore = data.finals['finals-score-lakers'] || 'N/A';
-        document.getElementById('finals-finals-score').textContent = `${hawksScore} - ${lakersScore}`;
+        const team1Score = data.finals['finals-score-team1'] || 'N/A';
+        const team2Score = data.finals['finals-score-team2'] || 'N/A';
+        document.getElementById('finals-finals-score').textContent = `${team1Score} - ${team2Score}`;
     })
     .catch(error => {
         console.error('Error fetching all picks:', error);

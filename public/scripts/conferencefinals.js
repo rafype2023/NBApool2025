@@ -1,18 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Conference Finals page loaded');
     fetch('/get-playin')
-        .then(response => {
-            console.log('Fetch /get-playin response status:', response.status);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log('Play-In data:', data);
             if (data.error || !data.east7 || !data.east8 || !data.west7 || !data.west8) {
                 alert('Please complete the Play-In step first.');
                 window.location.href = '/playin.html';
                 return;
             }
-            populateWinners();
+            fetchSemifinalsData();
         })
         .catch(error => {
             console.error('Error fetching Play-In data:', error);
@@ -21,14 +17,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
-function populateWinners() {
+function fetchSemifinalsData() {
+    fetch('/get-semifinals')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Semifinals data:', data);
+            if (!data['east-match1-winner'] || !data['east-match2-winner'] || !data['west-match1-winner'] || !data['west-match2-winner']) {
+                alert('Please complete the Semifinals step first.');
+                window.location.href = '/semifinals.html';
+                return;
+            }
+            populateMatchups(data);
+        })
+        .catch(error => {
+            console.error('Error fetching Semifinals data:', error);
+            alert('Please complete the Semifinals step first.');
+            window.location.href = '/semifinals.html';
+        });
+}
+
+function populateMatchups(semifinalsData) {
+    const teamLogos = {
+        'Bucks': '/images/bucks.png',
+        'Heat': '/images/heat.png',
+        'Celtics': '/images/celtics.png',
+        'Pacers': '/images/pacers.png',
+        'Knicks': '/images/knicks.png',
+        'Sixers': '/images/sixers.png',
+        'Hawks': '/images/hawks.png',
+        'Bulls': '/images/bulls.png',
+        'Hornets': '/images/hornets.png',
+        'Wizards': '/images/wizards.png',
+        'Nets': '/images/nets.png',
+        'Raptors': '/images/raptors.png',
+        'Nuggets': '/images/nuggets.png',
+        'Suns': '/images/suns.png',
+        'Warriors': '/images/warriors.png',
+        'Mavericks': '/images/mavericks.png',
+        'Lakers': '/images/lakers.png',
+        'Clippers': '/images/clippers.png',
+        'Pelicans': '/images/pelicans.png',
+        'Jazz': '/images/jazz.png',
+        'Kings': '/images/kings.png',
+        'Spurs': '/images/spurs.png'
+    };
+
     const matchups = [
-        { id: 'east-final-winner', teams: ['Hawks', 'Bucks'] },
-        { id: 'west-final-winner', teams: ['Lakers', 'Warriors'] }
+        { id: 'east-final-winner', teams: [semifinalsData['east-match1-winner'], semifinalsData['east-match2-winner']], logos: ['east-final-team1-logo', 'east-final-team2-logo'] },
+        { id: 'west-final-winner', teams: [semifinalsData['west-match1-winner'], semifinalsData['west-match2-winner']], logos: ['west-final-team1-logo', 'west-final-team2-logo'] }
     ];
 
-    console.log('Populating winners for matchups:', matchups);
     matchups.forEach(matchup => {
+        // Populate logos
+        document.getElementById(matchup.logos[0]).src = teamLogos[matchup.teams[0]] || '/images/default.png';
+        document.getElementById(matchup.logos[0]).alt = `${matchup.teams[0]} Logo`;
+        document.getElementById(matchup.logos[1]).src = teamLogos[matchup.teams[1]] || '/images/default.png';
+        document.getElementById(matchup.logos[1]).alt = `${matchup.teams[1]} Logo`;
+
+        // Populate dropdown
         const select = document.getElementById(matchup.id);
         if (select) {
             matchup.teams.forEach(team => {
@@ -74,7 +120,7 @@ function submitConferenceFinals() {
             alert('Error: ' + data.error);
         } else {
             alert('Conference Finals submitted successfully!');
-            window.location.href = '/finals.html'; // Next step in sequence
+            window.location.href = '/finals.html';
         }
     })
     .catch(error => {

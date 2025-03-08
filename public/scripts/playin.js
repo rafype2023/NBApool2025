@@ -1,20 +1,33 @@
-// This is the complete playin.js file. Paste this entire content into the file.
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/get-playin')
-        .then(response => response.json())
+    console.log('Play-In page loaded');
+    fetch('/get-playin', {
+        method: 'GET',
+        credentials: 'include' // Ensure cookies are sent
+    })
+        .then(response => {
+            console.log('Fetch /get-playin response status:', response.status);
+            return response.json();
+        })
         .then(data => {
-            if (!data.error) {
-                document.getElementById('east7').value = data.east7 || '';
-                document.getElementById('east8').value = data.east8 || '';
-                document.getElementById('west7').value = data.west7 || '';
-                document.getElementById('west8').value = data.west8 || '';
+            if (data.error) {
+                alert('Error: ' + data.error);
+                window.location.href = '/';
+                return;
             }
+            document.getElementById('east7').value = data.east7 || '';
+            document.getElementById('east8').value = data.east8 || '';
+            document.getElementById('west7').value = data.west7 || '';
+            document.getElementById('west8').value = data.west8 || '';
             populateDropdowns();
         })
         .catch(error => {
             console.error('Error fetching Play-In data:', error);
+            alert('Please complete registration first.');
+            window.location.href = '/';
             populateDropdowns();
         });
+
+    document.getElementById('playin-form').addEventListener('submit', submitPlayin);
 });
 
 function populateDropdowns() {
@@ -51,7 +64,9 @@ function populateDropdowns() {
     });
 }
 
-function submitPlayin() {
+function submitPlayin(event) {
+    event.preventDefault();
+
     const formData = {
         east7: document.getElementById('east7').value,
         east8: document.getElementById('east8').value,
@@ -74,18 +89,25 @@ function submitPlayin() {
         return;
     }
 
+    console.log('Submitting Play-In data:', formData);
     fetch('/submit-playin', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        credentials: 'include' // Ensure cookies are sent
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Fetch /submit-playin response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Submit response:', data);
         if (data.error) {
             alert('Error: ' + data.error);
         } else {
+            alert('Play-In data saved successfully!');
             window.location.href = '/firstround_east.html';
         }
     })

@@ -1,14 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('First Round East page loaded');
-    fetch('/get-playin')
+    fetch('/get-playin', {
+        method: 'GET',
+        credentials: 'include' // Ensure cookies are sent
+    })
         .then(response => {
             console.log('Fetch /get-playin response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
             console.log('Play-In data:', data);
             if (data.error || !data.east7 || !data.east8 || !data.west7 || !data.west8) {
-                alert('Please complete the Play-In step first.');
+                alert('Please complete the Play-In step first or check for errors: ' + (data.error || 'Missing Play-In data'));
                 window.location.href = '/playin.html';
                 return;
             }
@@ -16,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Error fetching Play-In data:', error);
-            alert('Please complete the Play-In step first.');
+            alert('Please complete the Play-In step first or contact support if the issue persists.');
             window.location.href = '/playin.html';
         });
 });
@@ -28,7 +34,13 @@ function populateMatchups(playinData) {
         'Hornets': '/images/hornets.png',
         'Wizards': '/images/wizards.png',
         'Nets': '/images/nets.png',
-        'Raptors': '/images/raptors.png'
+        'Raptors': '/images/raptors.png',
+        'Bucks': '/images/bucks.png',
+        'Heat': '/images/heat.png',
+        'Celtics': '/images/celtics.png',
+        'Pacers': '/images/pacers.png',
+        'Knicks': '/images/knicks.png',
+        'Sixers': '/images/sixers.png'
         // Add more teams as needed
     };
 
@@ -49,6 +61,7 @@ function populateMatchups(playinData) {
     matchups.forEach(matchup => {
         const select = document.getElementById(matchup.id);
         if (select) {
+            select.innerHTML = ''; // Clear existing options
             matchup.teams.forEach(team => {
                 const option = document.createElement('option');
                 option.value = team;
@@ -80,10 +93,14 @@ function submitFirstRoundEast() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ firstRoundEast: winners })
+        body: JSON.stringify({ firstRoundEast: winners }),
+        credentials: 'include' // Ensure cookies are sent
     })
     .then(response => {
         console.log('Fetch /submit-firstround-east response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
         return response.json();
     })
     .then(data => {
@@ -97,6 +114,6 @@ function submitFirstRoundEast() {
     })
     .catch(error => {
         console.error('Error submitting First Round East data:', error);
-        alert('An error occurred. Please try again.');
+        alert('An error occurred. Please try again or contact support.');
     });
 }
