@@ -4,55 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pool NBA 2025 - First Round East</title>
-    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/style.css">
 </head>
 <body>
-    <div class="header">
-        <img src="/images/nba-pool-logo.png" alt="Pool NBA Logo" class="logo">
-        <h1>BIENVENIDOS AL <span>POOL NBA</span> 2025</h1>
-    </div>
-
     <div class="container">
+        <img src="/images/nba-pool-logo.png" alt="NBA Pool Logo" class="logo">
+        <h1>BIENVENIDOS AL POOL NBA 2025</h1>
         <h2>FIRST ROUND - EASTERN CONFERENCE</h2>
-        <div class="matchup">
-            <img src="/images/bucks.png" alt="Bucks Logo">
-            <span>vs.</span>
-            <img id="east7-logo" alt="East 7th Seed Logo">
-            <select id="match1-winner" name="match1-winner" class="winner-select" required>
-                <option value="" disabled selected>Select WINNER</option>
-            </select>
-        </div>
-        <div class="matchup">
-            <img src="/images/heat.png" alt="Heat Logo">
-            <span>vs.</span>
-            <img id="east8-logo" alt="East 8th Seed Logo">
-            <select id="match2-winner" name="match2-winner" class="winner-select" required>
-                <option value="" disabled selected>Select WINNER</option>
-            </select>
-        </div>
-        <div class="matchup">
-            <img src="/images/celtics.png" alt="Celtics Logo">
-            <span>vs.</span>
-            <img src="/images/pacers.png" alt="Pacers Logo">
-            <select id="match3-winner" name="match3-winner" class="winner-select" required>
-                <option value="" disabled selected>Select WINNER</option>
-            </select>
-        </div>
-        <div class="matchup">
-            <img src="/images/knicks.png" alt="Knicks Logo">
-            <span>vs.</span>
-            <img src="/images/sixers.png" alt="Sixers Logo">
-            <select id="match4-winner" name="match4-winner" class="winner-select" required>
-                <option value="" disabled selected>Select WINNER</option>
-            </select>
-        </div>
-
-        <div class="button-group">
-            <button onclick="window.location.href='/playin.html';">Previous</button>
-            <button onclick="submitFirstRoundEast()">Next</button>
-        </div>
+        <form id="firstround-east-form">
+            <div class="matchup">
+                <img src="/images/bucks.png" alt="Bucks"> vs. <span>7th Seed</span>
+                <select name="matchup1" id="matchup1">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+            </div>
+            <div class="matchup">
+                <img src="/images/hawks.png" alt="Hawks"> vs. <span>8th Seed</span>
+                <select name="matchup2" id="matchup2">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+            </div>
+            <div class="matchup">
+                <img src="/images/celtics.png" alt="Celtics"> vs. <span>6th Seed</span>
+                <select name="matchup3" id="matchup3">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+            </div>
+            <div class="matchup">
+                <img src="/images/knicks.png" alt="Knicks"> vs. <span>Sixers</span>
+                <select name="matchup4" id="matchup4">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+            </div>
+            <button type="button" onclick="window.location.href='/playin.html'">Previous</button>
+            <button type="submit">Next</button>
+        </form>
     </div>
-
     <script src="/scripts/firstround_east.js"></script>
 </body>
 </html>

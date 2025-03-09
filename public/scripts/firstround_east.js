@@ -17,11 +17,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/';
                 return;
             }
-            // Populate dropdowns
-            document.getElementById('matchup1').value = data.matchup1 || '';
-            document.getElementById('matchup2').value = data.matchup2 || '';
-            document.getElementById('matchup3').value = data.matchup3 || '';
-            document.getElementById('matchup4').value = data.matchup4 || '';
+            // Safely populate dropdowns with existence check
+            const matchups = ['matchup1', 'matchup2', 'matchup3', 'matchup4'];
+            let allElementsFound = true;
+            matchups.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.value = data[id] || '';
+                } else {
+                    console.error(`Select element with id '${id}' not found`);
+                    allElementsFound = false;
+                }
+            });
+            if (!allElementsFound) {
+                alert('Form error. Some elements are missing. Refresh or contact support.');
+                return;
+            }
             populateDropdowns();
         })
         .catch(error => {
@@ -44,27 +55,27 @@ function populateDropdowns() {
     const teams = ['Bucks', 'Hawks', 'Celtics', 'Knicks', '7th Seed', '8th Seed', '6th Seed', 'Sixers'];
     ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
         const select = document.getElementById(id);
-        if (!select) {
-            console.error(`Select element with id '${id}' not found`);
-            return;
+        if (select) {
+            select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
+            teams.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team;
+                option.textContent = team;
+                select.appendChild(option);
+            });
+        } else {
+            console.error(`Select element with id '${id}' not found during population`);
         }
-        select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
-        teams.forEach(team => {
-            const option = document.createElement('option');
-            option.value = team;
-            option.textContent = team;
-            select.appendChild(option);
-        });
     });
 }
 
 function submitFirstRoundEast(event) {
     event.preventDefault();
     const formData = {
-        matchup1: document.getElementById('matchup1').value,
-        matchup2: document.getElementById('matchup2').value,
-        matchup3: document.getElementById('matchup3').value,
-        matchup4: document.getElementById('matchup4').value
+        matchup1: document.getElementById('matchup1')?.value || '',
+        matchup2: document.getElementById('matchup2')?.value || '',
+        matchup3: document.getElementById('matchup3')?.value || '',
+        matchup4: document.getElementById('matchup4')?.value || ''
     };
 
     if (!formData.matchup1 || !formData.matchup2 || !formData.matchup3 || !formData.matchup4) {
