@@ -67,6 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 select.value = data.finals.champion || '';
             }
+            // Set existing MVP and final score values
+            document.getElementById('mvp').value = data.finals.mvp || '';
+            document.getElementById('finalScore').value = data.finals.finalScore || '';
         })
         .catch(error => {
             console.error('Fetch error for /get-finals:', error);
@@ -86,11 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
 function submitFinals(event) {
     event.preventDefault();
     const formData = {
-        champion: document.getElementById('champion')?.value || ''
+        champion: document.getElementById('champion')?.value || '',
+        mvp: document.getElementById('mvp')?.value || '',
+        finalScore: document.getElementById('finalScore')?.value || ''
     };
 
-    if (!formData.champion) {
-        alert('Please select the champion.');
+    if (!formData.champion || !formData.mvp || !formData.finalScore) {
+        alert('Please select the champion, enter the MVP, and provide the final score.');
         return;
     }
 

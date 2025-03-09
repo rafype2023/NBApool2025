@@ -17,21 +17,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/playin.html';
                 return;
             }
-            // Map team names to image file names (nicknames)
             const teamImages = {
                 'OKC': 'thunder.png',
                 'Denver': 'nuggets.png',
                 'Los Angeles': 'lakers.png',
                 'Memphis': 'grizzlies.png',
+                'Houston': 'rockets.png',
+                'Golden State': 'warriors.png',
                 'Suns': 'suns.png',
                 'Pelicans': 'pelicans.png',
                 'Kings': 'kings.png',
                 'Spurs': 'spurs.png',
-                'Timberwolves': 'timberwolves.png',
-                'Golden State': 'warriors.png',
-                'Houston': 'rockets.png'
+                'Timberwolves': 'timberwolves.png'
             };
-            // Update opponent labels and images with Play-In results
             document.getElementById('matchup1-opponent').textContent = data.playin.west8;
             document.getElementById('matchup1-opponent-img').src = `/images/${teamImages[data.playin.west8] || 'placeholder.png'}`;
             document.getElementById('matchup1-opponent-img').alt = data.playin.west8;
@@ -39,30 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('matchup2-opponent-img').src = `/images/${teamImages[data.playin.west7] || 'placeholder.png'}`;
             document.getElementById('matchup2-opponent-img').alt = data.playin.west7;
             document.getElementById('matchup3-opponent').textContent = 'Golden State';
-            document.getElementById('matchup3-opponent-img').src = '/images/warriors.png';
-            document.getElementById('matchup3-opponent-img').alt = 'Golden State Warriors';
             document.getElementById('matchup4-opponent').textContent = 'Houston';
-            document.getElementById('matchup4-opponent-img').src = '/images/rockets.png';
-            document.getElementById('matchup4-opponent-img').alt = 'Houston Rockets';
-            // Define matchups based on Western Conference order
             const matchups = {
-                matchup1: ['OKC', data.playin.west8],      // 1st vs 8th
-                matchup2: ['Denver', data.playin.west7],    // 2nd vs 7th
-                matchup3: ['Los Angeles', 'Golden State'],  // 3rd vs 6th
-                matchup4: ['Memphis', 'Houston']            // 4th vs 5th
+                matchup1: ['OKC', data.playin.west8],
+                matchup2: ['Denver', data.playin.west7],
+                matchup3: ['Los Angeles', 'Golden State'],
+                matchup4: ['Memphis', 'Houston']
             };
-            // Populate dropdowns
             const allElementsFound = populateDropdowns(matchups);
             if (!allElementsFound) {
                 alert('Form error. Some elements are missing. Refresh or contact support.');
                 return;
             }
-            // Set previously saved values
             ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
                 const select = document.getElementById(id);
-                if (select) {
-                    select.value = data.firstRoundWest[id] || '';
-                }
+                if (select) select.value = data.firstRoundWest[id] || '';
+            });
+            ['series1', 'series2', 'series3', 'series4'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) select.value = data.firstRoundWest[id] || '';
             });
         })
         .catch(error => {
@@ -112,11 +105,16 @@ function submitFirstRoundWest(event) {
         matchup1: document.getElementById('matchup1')?.value || '',
         matchup2: document.getElementById('matchup2')?.value || '',
         matchup3: document.getElementById('matchup3')?.value || '',
-        matchup4: document.getElementById('matchup4')?.value || ''
+        matchup4: document.getElementById('matchup4')?.value || '',
+        series1: document.getElementById('series1')?.value || '',
+        series2: document.getElementById('series2')?.value || '',
+        series3: document.getElementById('series3')?.value || '',
+        series4: document.getElementById('series4')?.value || ''
     };
 
-    if (!formData.matchup1 || !formData.matchup2 || !formData.matchup3 || !formData.matchup4) {
-        alert('Please select all winners.');
+    if (!formData.matchup1 || !formData.matchup2 || !formData.matchup3 || !formData.matchup4 ||
+        !formData.series1 || !formData.series2 || !formData.series3 || !formData.series4) {
+        alert('Please select all winners and series lengths.');
         return;
     }
 

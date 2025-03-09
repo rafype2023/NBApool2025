@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/';
                 return;
             }
-            // Map team names to image file names (nicknames)
             const teamImages = {
                 'Cleveland': 'cavaliers.png',
                 'Boston': 'celtics.png',
@@ -25,10 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Milwaukee': 'bucks.png',
                 'Magic': 'magic.png',
                 'Pistons': 'pistons.png',
-                'Detroit': 'pistons.png', // Same as Pistons
+                'Detroit': 'pistons.png',
                 'Indiana': 'pacers.png'
             };
-            // Update opponent labels and images with Play-In results
             document.getElementById('matchup1-opponent').textContent = data.playin.east8;
             document.getElementById('matchup1-opponent-img').src = `/images/${teamImages[data.playin.east8] || 'placeholder.png'}`;
             document.getElementById('matchup1-opponent-img').alt = data.playin.east8;
@@ -37,29 +35,26 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('matchup2-opponent-img').alt = data.playin.east7;
             document.getElementById('matchup3-opponent').textContent = 'Detroit';
             document.getElementById('matchup3-opponent-img').src = '/images/pistons.png';
-            document.getElementById('matchup3-opponent-img').alt = 'Detroit Pistons';
             document.getElementById('matchup4-opponent').textContent = 'Indiana';
             document.getElementById('matchup4-opponent-img').src = '/images/pacers.png';
-            document.getElementById('matchup4-opponent-img').alt = 'Indiana Pacers';
-            // Define matchups based on Eastern Conference order
             const matchups = {
-                matchup1: ['Cleveland', data.playin.east8], // 1st vs 8th
-                matchup2: ['Boston', data.playin.east7],    // 2nd vs 7th
-                matchup3: ['New York Knicks', 'Detroit'],   // 3rd vs 6th
-                matchup4: ['Milwaukee', 'Indiana']          // 4th vs 5th
+                matchup1: ['Cleveland', data.playin.east8],
+                matchup2: ['Boston', data.playin.east7],
+                matchup3: ['New York Knicks', 'Detroit'],
+                matchup4: ['Milwaukee', 'Indiana']
             };
-            // Populate dropdowns
             const allElementsFound = populateDropdowns(matchups);
             if (!allElementsFound) {
                 alert('Form error. Some elements are missing. Refresh or contact support.');
                 return;
             }
-            // Set previously saved values
             ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
                 const select = document.getElementById(id);
-                if (select) {
-                    select.value = data.firstRoundEast[id] || '';
-                }
+                if (select) select.value = data.firstRoundEast[id] || '';
+            });
+            ['series1', 'series2', 'series3', 'series4'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) select.value = data.firstRoundEast[id] || '';
             });
         })
         .catch(error => {
@@ -109,11 +104,16 @@ function submitFirstRoundEast(event) {
         matchup1: document.getElementById('matchup1')?.value || '',
         matchup2: document.getElementById('matchup2')?.value || '',
         matchup3: document.getElementById('matchup3')?.value || '',
-        matchup4: document.getElementById('matchup4')?.value || ''
+        matchup4: document.getElementById('matchup4')?.value || '',
+        series1: document.getElementById('series1')?.value || '',
+        series2: document.getElementById('series2')?.value || '',
+        series3: document.getElementById('series3')?.value || '',
+        series4: document.getElementById('series4')?.value || ''
     };
 
-    if (!formData.matchup1 || !formData.matchup2 || !formData.matchup3 || !formData.matchup4) {
-        alert('Please select all winners.');
+    if (!formData.matchup1 || !formData.matchup2 || !formData.matchup3 || !formData.matchup4 ||
+        !formData.series1 || !formData.series2 || !formData.series3 || !formData.series4) {
+        alert('Please select all winners and series lengths.');
         return;
     }
 

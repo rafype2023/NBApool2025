@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = data.error.includes('Semifinals') ? '/semifinals.html' : '/';
                 return;
             }
-            // Map team names to image file names (nicknames)
             const teamImages = {
                 'Cleveland': 'cavaliers.png',
                 'Boston': 'celtics.png',
@@ -33,9 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Memphis': 'grizzlies.png',
                 'Houston': 'rockets.png',
                 'Golden State': 'warriors.png'
-                // Add more teams as needed based on Play-In possibilities
             };
-            // Set Eastern Conference Finals
             const eastTeam1 = data.semifinals.east1 || 'Winner East 1';
             const eastTeam2 = data.semifinals.east2 || 'Winner East 2';
             document.getElementById('east-team1').querySelector('span').textContent = eastTeam1;
@@ -44,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('east-team2').querySelector('span').textContent = eastTeam2;
             document.getElementById('east-team2').querySelector('img').src = `/images/${teamImages[eastTeam2] || 'placeholder.png'}`;
             document.getElementById('east-team2').querySelector('img').alt = eastTeam2;
-            // Set Western Conference Finals
             const westTeam1 = data.semifinals.west1 || 'Winner West 1';
             const westTeam2 = data.semifinals.west2 || 'Winner West 2';
             document.getElementById('west-team1').querySelector('span').textContent = westTeam1;
@@ -53,19 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('west-team2').querySelector('span').textContent = westTeam2;
             document.getElementById('west-team2').querySelector('img').src = `/images/${teamImages[westTeam2] || 'placeholder.png'}`;
             document.getElementById('west-team2').querySelector('img').alt = westTeam2;
-            // Define matchups for dropdowns
             const matchups = {
                 eastWinner: [eastTeam1, eastTeam2],
                 westWinner: [westTeam1, westTeam2]
             };
-            console.log('Matchups defined:', matchups); // Debug log
-            // Populate dropdowns with only the two teams in each matchup
+            console.log('Matchups defined:', matchups);
             ['eastWinner', 'westWinner'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
                     select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
                     const teams = matchups[id].filter(team => team && team !== 'Winner East 1' && team !== 'Winner East 2' && team !== 'Winner West 1' && team !== 'Winner West 2');
-                    console.log(`Populating ${id} with teams:`, teams); // Debug log
+                    console.log(`Populating ${id} with teams:`, teams);
                     if (teams.length === 2) {
                         teams.forEach(team => {
                             const option = document.createElement('option');
@@ -78,6 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     select.value = data.conferenceFinals[id] || '';
                 }
+            });
+            ['eastSeries', 'westSeries'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) select.value = data.conferenceFinals[id] || '';
             });
         })
         .catch(error => {
@@ -99,11 +97,13 @@ function submitConferenceFinals(event) {
     event.preventDefault();
     const formData = {
         eastWinner: document.getElementById('eastWinner')?.value || '',
-        westWinner: document.getElementById('westWinner')?.value || ''
+        westWinner: document.getElementById('westWinner')?.value || '',
+        eastSeries: document.getElementById('eastSeries')?.value || '',
+        westSeries: document.getElementById('westSeries')?.value || ''
     };
 
-    if (!formData.eastWinner || !formData.westWinner) {
-        alert('Please select all winners.');
+    if (!formData.eastWinner || !formData.westWinner || !formData.eastSeries || !formData.westSeries) {
+        alert('Please select all winners and series lengths.');
         return;
     }
 
