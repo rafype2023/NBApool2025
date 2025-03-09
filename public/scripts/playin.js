@@ -1,16 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Play-In page loaded');
+    console.log('Play-In page loaded with Super Grok optimization');
     fetch('/get-playin', {
         method: 'GET',
-        credentials: 'include' // Ensure cookies are sent
+        credentials: 'include', // Force sending session cookie
+        mode: 'cors' // Explicitly set CORS mode
     })
         .then(response => {
-            console.log('Fetch /get-playin response status:', response.status);
+            console.log('GET /get-playin response:', response.status, response.headers);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then(data => {
+            console.log('Play-In data received:', data);
             if (data.error) {
-                alert('Error: ' + data.error);
+                alert(`Error: ${data.error}. Redirecting to registration.`);
                 window.location.href = '/';
                 return;
             }
@@ -21,52 +24,43 @@ document.addEventListener('DOMContentLoaded', () => {
             populateDropdowns();
         })
         .catch(error => {
-            console.error('Error fetching Play-In data:', error);
-            alert('Please complete registration first.');
-            window.location.href = '/';
-            populateDropdowns();
+            console.error('Fetch error for /get-playin:', error);
+            alert('Failed to load Play-In data. Please ensure you’re registered or contact support.');
+            populateDropdowns(); // Fallback to populate empty dropdowns
         });
 
-    document.getElementById('playin-form').addEventListener('submit', submitPlayin);
+    const playinForm = document.getElementById('playin-form');
+    if (!playinForm) {
+        console.error('Play-In form not found. Check if id="playin-form" exists.');
+        alert('Form error. Refresh or contact support.');
+        return;
+    }
+    playinForm.addEventListener('submit', submitPlayin);
 });
 
 function populateDropdowns() {
     const eastTeams = ['Pistons', 'Magic', 'Wizards', 'Hawks'];
     const westTeams = ['Rockets', 'Spurs', 'Trail Blazers', 'Jazz'];
 
-    const east7Select = document.getElementById('east7');
-    const east8Select = document.getElementById('east8');
-    const west7Select = document.getElementById('west7');
-    const west8Select = document.getElementById('west8');
-
-    eastTeams.forEach(team => {
-        const option7 = document.createElement('option');
-        option7.value = team;
-        option7.textContent = team;
-        east7Select.appendChild(option7);
-
-        const option8 = document.createElement('option');
-        option8.value = team;
-        option8.textContent = team;
-        east8Select.appendChild(option8);
-    });
-
-    westTeams.forEach(team => {
-        const option7 = document.createElement('option');
-        option7.value = team;
-        option7.textContent = team;
-        west7Select.appendChild(option7);
-
-        const option8 = document.createElement('option');
-        option8.value = team;
-        option8.textContent = team;
-        west8Select.appendChild(option8);
+    ['east7', 'east8', 'west7', 'west8'].forEach(id => {
+        const select = document.getElementById(id);
+        if (!select) {
+            console.error(`Select element with id '${id}' not found`);
+            return;
+        }
+        select.innerHTML = ''; // Clear existing options
+        const teams = id.startsWith('east') ? eastTeams : westTeams;
+        teams.forEach(team => {
+            const option = document.createElement('option');
+            option.value = team;
+            option.textContent = team;
+            select.appendChild(option);
+        });
     });
 }
 
 function submitPlayin(event) {
     event.preventDefault();
-
     const formData = {
         east7: document.getElementById('east7').value,
         east8: document.getElementById('east8').value,
@@ -78,12 +72,10 @@ function submitPlayin(event) {
         alert('Please select all Play-In seeds.');
         return;
     }
-
     if (formData.east7 === formData.east8) {
         alert('Eastern Conference 7th and 8th seeds must be different teams.');
         return;
     }
-
     if (formData.west7 === formData.west8) {
         alert('Western Conference 7th and 8th seeds must be different teams.');
         return;
@@ -92,27 +84,26 @@ function submitPlayin(event) {
     console.log('Submitting Play-In data:', formData);
     fetch('/submit-playin', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-        credentials: 'include' // Ensure cookies are sent
+        credentials: 'include', // Force sending session cookie
+        mode: 'cors' // Explicitly set CORS mode
     })
-    .then(response => {
-        console.log('Fetch /submit-playin response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Submit response:', data);
-        if (data.error) {
-            alert('Error: ' + data.error);
-        } else {
-            alert('Play-In data saved successfully!');
-            window.location.href = '/firstround_east.html';
-        }
-    })
-    .catch(error => {
-        console.error('Error submitting Play-In data:', error);
-        alert('An error occurred. Please try again.');
-    });
+        .then(response => {
+            console.log('POST /submit-playin response:', response.status, response.headers);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Submit response:', data);
+            if (data.error) alert(`Error: ${data.error}`);
+            else {
+                alert('Play-In data saved successfully!');
+                window.location.href = '/firstround_east.html';
+            }
+        })
+        .catch(error => {
+            console.error('Submit error for /submit-playin:', error);
+            alert('Failed to save Play-In data. Please try again or contact support.');
+        });
 }

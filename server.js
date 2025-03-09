@@ -1,8 +1,10 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const mongoose = require('mongoose');
+const cors = require('cors');
 const path = require('path');
+
 const app = express();
 
 // MongoDB Connection
@@ -10,419 +12,132 @@ const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/nbapool';
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-})
-    .then(() => {
-        console.log('Connected to MongoDB');
-    })
-    .catch(err => {
-        console.error('MongoDB connection error:', err);
-    });
+}).then(() => console.log('MongoDB connected successfully'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-// Middleware
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+// CORS Configuration
+app.use(cors({
+    origin: 'https://nbapool2025.onrender.com',
+    credentials: true, // Allow cookies
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-// Session Middleware
+// Session Configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: process.env.SESSION_SECRET || 'your-secure-secret-key',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: mongoUrl, // Use the same MongoDB URL as Mongoose
-        ttl: 24 * 60 * 60, // Session TTL of 24 hours (in seconds)
-        autoRemove: 'native' // Automatically remove expired sessions
+        mongoUrl: mongoUrl,
+        ttl: 24 * 60 * 60, // 24 hours
+        autoRemove: 'native',
+        autoRemoveInterval: 10
+    }, (err) => {
+        if (err) console.error('MongoStore error:', err);
+        else console.log('MongoStore initialized');
     }),
-    cookie: { 
-        secure: process.env.NODE_ENV === 'production', // Secure cookies in production (HTTPS)
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        httpOnly: true, // Prevent client-side access to the cookie
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Cross-site cookies in production, lax in development
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        path: '/',
+        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
     }
 }));
 
-// Request logging middleware
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Logging Middleware
 app.use((req, res, next) => {
-    console.log(`[${req.method}] ${req.url} - Session ID: ${req.sessionID || 'none'}, UserId: ${req.session.userId || 'undefined'}, Cookie: ${req.headers.cookie || 'none'}`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - Session: ${req.sessionID}, UserId: ${req.session.userId}, Cookie: ${req.headers.cookie || 'none'}`);
     next();
 });
 
-// User Schema
+// User Schema (Simplified for Example)
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    phone: { type: String, required: true },
-    comments: { type: String },
-    paymentMethod: { type: String, required: true },
-    playin: { type: Object, default: {} },
-    firstRoundEast: { type: Object, default: {} },
-    firstRoundWest: { type: Object, default: {} },
-    semifinals: { type: Object, default: {} },
-    conferenceFinals: { type: Object, default: {} },
-    finals: { type: Object, default: {} },
-    summary: { type: Object, default: {} }
+    name: String,
+    email: { type: String, unique: true },
+    phone: String,
+    comments: String,
+    paymentMethod: String,
+    playin: Object,
+    firstRoundEast: Object,
+    firstRoundWest: Object,
+    semifinals: Object,
+    conferenceFinals: Object,
+    finals: Object
 });
-
 const User = mongoose.model('User', userSchema);
 
 // Routes
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
-
-app.get('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            console.error('Error destroying session:', err);
-            return res.status(500).json({ error: 'Logout failed' });
-        }
-        res.clearCookie('connect.sid'); // Clear the session cookie
-        res.redirect('/');
-    });
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
+app.get('/playin.html', (req, res) => res.sendFile(path.join(__dirname, 'views', 'playin.html')));
 
 app.post('/submit-registration', async (req, res) => {
+    console.log('Registration attempt:', req.body);
+    if (!req.body.name || !req.body.email || !req.body.phone || !req.body.paymentMethod) {
+        return res.status(400).json({ error: 'All fields except comments are required' });
+    }
     try {
-        const { name, email, phone, comments, paymentMethod } = req.body;
+        const existingUser = await User.findOne({ email: req.body.email });
+        if (existingUser) return res.status(400).json({ error: 'Email already registered' });
 
-        if (!name || !email || !phone || !paymentMethod) {
-            return res.status(400).json({ error: 'All fields are required' });
-        }
-
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ error: 'Email already registered' });
-        }
-
-        const user = new User({
-            name,
-            email,
-            phone,
-            comments,
-            paymentMethod,
-            playin: {},
-            firstRoundEast: {},
-            firstRoundWest: {},
-            semifinals: {},
-            conferenceFinals: {},
-            finals: {},
-            summary: {}
-        });
-
+        const user = new User(req.body);
         await user.save();
-        req.session.userId = user._id; // Set the userId in the session
-        req.session.save((err) => {
-            if (err) {
-                console.error('Error saving session after registration:', err);
-                return res.status(500).json({ error: 'Error saving session' });
-            }
-            console.log(`User saved with ID: ${user._id}, Session ID: ${req.sessionID}, Saved UserId: ${req.session.userId}`);
-            res.json({ message: 'Registration successful' });
+        req.session.userId = user._id.toString();
+        req.session.save(err => {
+            if (err) console.error('Session save error:', err);
+            else console.log('Session saved with UserId:', req.session.userId);
         });
+        res.json({ message: 'Registration successful' });
     } catch (error) {
-        console.error('Error saving user:', error);
-        res.status(500).json({ error: 'Internal Server Error: ' + error.message });
+        console.error('Registration error:', error);
+        res.status(500).json({ error: 'Server error during registration' });
     }
 });
 
-app.get('/playin.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'playin.html'));
-});
-
-app.get('/firstround_east.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'firstround_east.html'));
-});
-
-app.get('/firstround_west.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'firstround_west.html'));
-});
-
-app.get('/semifinals.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'semifinals.html'));
-});
-
-app.get('/conferencefinals.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'conferencefinals.html'));
-});
-
-app.get('/finals.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'finals.html'));
-});
-
-app.get('/summary.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'summary.html'));
-});
-
 app.get('/get-playin', async (req, res) => {
+    console.log('Get Play-In request:', { sessionId: req.sessionID, userId: req.session.userId });
+    if (!req.session.userId) {
+        console.warn('Unauthorized access to /get-playin');
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
     try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
         const user = await User.findById(req.session.userId);
         if (!user || !user.playin) {
             return res.json({ east7: '', east8: '', west7: '', west8: '' });
         }
-
         res.json(user.playin);
     } catch (error) {
         console.error('Error fetching Play-In data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.get('/get-firstround-east', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const user = await User.findById(req.session.userId);
-        if (!user || !user.firstRoundEast) {
-            return res.json({});
-        }
-
-        res.json(user.firstRoundEast);
-    } catch (error) {
-        console.error('Error fetching First Round East data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.get('/get-firstround-west', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const user = await User.findById(req.session.userId);
-        if (!user || !user.firstRoundWest) {
-            return res.json({});
-        }
-
-        res.json(user.firstRoundWest);
-    } catch (error) {
-        console.error('Error fetching First Round West data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.get('/get-semifinals', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const user = await User.findById(req.session.userId);
-        if (!user || !user.semifinals) {
-            return res.json({});
-        }
-
-        res.json(user.semifinals);
-    } catch (error) {
-        console.error('Error fetching Semifinals data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.get('/get-conferencefinals', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const user = await User.findById(req.session.userId);
-        if (!user || !user.conferenceFinals) {
-            return res.json({});
-        }
-
-        res.json(user.conferenceFinals);
-    } catch (error) {
-        console.error('Error fetching Conference Finals data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.get('/get-all-picks', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const user = await User.findById(req.session.userId);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        const picks = {
-            playin: user.playin || {},
-            firstRoundEast: user.firstRoundEast || {},
-            firstRoundWest: user.firstRoundWest || {},
-            semifinals: user.semifinals || {},
-            conferenceFinals: user.conferenceFinals || {},
-            finals: user.finals || {}
-        };
-
-        res.json(picks);
-    } catch (error) {
-        console.error('Error fetching all picks:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Server error fetching Play-In data' });
     }
 });
 
 app.post('/submit-playin', async (req, res) => {
+    console.log('Submit Play-In request:', { sessionId: req.sessionID, userId: req.session.userId, body: req.body });
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
     try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const { east7, east8, west7, west8 } = req.body;
-        const playinData = { east7, east8, west7, west8 };
-
         const user = await User.findByIdAndUpdate(
             req.session.userId,
-            { playin: playinData },
+            { playin: req.body },
             { new: true, runValidators: true }
         );
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        console.log(`Play-In saved for userId: ${req.session.userId}`);
+        if (!user) return res.status(404).json({ error: 'User not found' });
         res.json({ message: 'Play-In data saved successfully' });
     } catch (error) {
         console.error('Error saving Play-In data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Server error saving Play-In data' });
     }
 });
 
-app.post('/submit-firstround-east', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const { firstRoundEast } = req.body;
-        const user = await User.findByIdAndUpdate(
-            req.session.userId,
-            { firstRoundEast: firstRoundEast },
-            { new: true, runValidators: true }
-        );
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        console.log(`First Round East saved for userId: ${req.session.userId}`);
-        res.json({ message: 'First Round East data saved successfully' });
-    } catch (error) {
-        console.error('Error saving First Round East data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.post('/submit-firstround-west', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const { firstRoundWest } = req.body;
-        const user = await User.findByIdAndUpdate(
-            req.session.userId,
-            { firstRoundWest: firstRoundWest },
-            { new: true, runValidators: true }
-        );
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        console.log(`First Round West saved for userId: ${req.session.userId}`);
-        res.json({ message: 'First Round West data saved successfully' });
-    } catch (error) {
-        console.error('Error saving First Round West data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.post('/submit-semifinals', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const { semifinals } = req.body;
-        const user = await User.findByIdAndUpdate(
-            req.session.userId,
-            { semifinals: semifinals },
-            { new: true, runValidators: true }
-        );
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        console.log(`Semifinals saved for userId: ${req.session.userId}`);
-        res.json({ message: 'Semifinals data saved successfully' });
-    } catch (error) {
-        console.error('Error saving Semifinals data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.post('/submit-conferencefinals', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const { conferenceFinals } = req.body;
-        const user = await User.findByIdAndUpdate(
-            req.session.userId,
-            { conferenceFinals: conferenceFinals },
-            { new: true, runValidators: true }
-        );
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        console.log(`Conference Finals saved for userId: ${req.session.userId}`);
-        res.json({ message: 'Conference Finals data saved successfully' });
-    } catch (error) {
-        console.error('Error saving Conference Finals data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-app.post('/submit-finals', async (req, res) => {
-    try {
-        if (!req.session.userId) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const { finals } = req.body;
-        const user = await User.findByIdAndUpdate(
-            req.session.userId,
-            { finals: finals },
-            { new: true, runValidators: true }
-        );
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        console.log(`Finals saved for userId: ${req.session.userId}`);
-        res.json({ message: 'Finals data saved successfully' });
-    } catch (error) {
-        console.error('Error saving Finals data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-// Start the server
+// Start Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
