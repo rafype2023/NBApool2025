@@ -44,7 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'Houston': 'rockets.png',
     'Utah': 'jazz.png'
     // Add more teams as needed
-};          // Use Play-In data for 7th and 8th seeds
+};         
+ // Use Play-In data for 7th and 8th seeds
             const east7 = data.playin.east7 || '7th Seed';
             const east8 = data.playin.east8 || '8th Seed';
             // Define matchups based on Play-In winners
