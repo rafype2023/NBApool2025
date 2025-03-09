@@ -1,7 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Semifinals page loaded');
-    fetch('/get-playin')
-        .then(response => response.json())
+    fetch('/get-playin', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors'
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             if (data.error || !data.east7 || !data.east8 || !data.west7 || !data.west8) {
                 alert('Please complete the Play-In step first.');
@@ -19,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function fetchFirstRoundData() {
     Promise.all([
-        fetch('/get-firstround-east').then(res => res.json()),
-        fetch('/get-firstround-west').then(res => res.json())
+        fetch('/get-firstround-east', { credentials: 'include', mode: 'cors' }).then(res => res.json()),
+        fetch('/get-firstround-west', { credentials: 'include', mode: 'cors' }).then(res => res.json())
     ])
     .then(([eastData, westData]) => {
         console.log('First Round East data:', eastData);
@@ -63,7 +70,11 @@ function populateMatchups(eastData, westData) {
         'Pelicans': '/images/pelicans.png',
         'Jazz': '/images/jazz.png',
         'Kings': '/images/kings.png',
-        'Spurs': '/images/spurs.png'
+        'Spurs': '/images/spurs.png',
+        'Pistons': '/images/pistons.png',
+        'Magic': '/images/magic.png',
+        'Rockets': '/images/rockets.png',
+        'Trail Blazers': '/images/trailblazers.png'
     };
 
     const matchups = [
@@ -74,15 +85,14 @@ function populateMatchups(eastData, westData) {
     ];
 
     matchups.forEach(matchup => {
-        // Populate logos
         document.getElementById(matchup.logos[0]).src = teamLogos[matchup.teams[0]] || '/images/default.png';
         document.getElementById(matchup.logos[0]).alt = `${matchup.teams[0]} Logo`;
         document.getElementById(matchup.logos[1]).src = teamLogos[matchup.teams[1]] || '/images/default.png';
         document.getElementById(matchup.logos[1]).alt = `${matchup.teams[1]} Logo`;
 
-        // Populate dropdown
         const select = document.getElementById(matchup.id);
         if (select) {
+            select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
             matchup.teams.forEach(team => {
                 const option = document.createElement('option');
                 option.value = team;
@@ -111,26 +121,26 @@ function submitSemifinals() {
 
     fetch('/submit-semifinals', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ semifinals: winners })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ semifinals: winners }),
+        credentials: 'include',
+        mode: 'cors'
     })
-    .then(response => {
-        console.log('Fetch /submit-semifinals response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Submit response:', data);
-        if (data.error) {
-            alert('Error: ' + data.error);
-        } else {
-            alert('Semifinals submitted successfully!');
-            window.location.href = '/conferencefinals.html';
-        }
-    })
-    .catch(error => {
-        console.error('Error submitting Semifinals data:', error);
-        alert('An error occurred. Please try again.');
-    });
+        .then(response => {
+            console.log('POST /submit-semifinals response:', response.status);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Submit response:', data);
+            if (data.error) alert(`Error: ${data.error}`);
+            else {
+                alert('Semifinals submitted successfully!');
+                window.location.href = '/conferencefinals.html';
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting Semifinals data:', error);
+            alert('An error occurred. Please try again.');
+        });
 }

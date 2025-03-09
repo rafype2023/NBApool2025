@@ -1,7 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Finals page loaded');
-    fetch('/get-playin')
-        .then(response => response.json())
+    fetch('/get-playin', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors'
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             if (data.error || !data.east7 || !data.east8 || !data.west7 || !data.west8) {
                 alert('Please complete the Play-In step first.');
@@ -18,8 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchConferenceFinalsData() {
-    fetch('/get-conferencefinals')
-        .then(response => response.json())
+    fetch('/get-conferencefinals', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors'
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             console.log('Conference Finals data:', data);
             if (!data['east-final-winner'] || !data['west-final-winner']) {
@@ -59,7 +73,11 @@ function populateMatchups(conferenceFinalsData) {
         'Pelicans': '/images/pelicans.png',
         'Jazz': '/images/jazz.png',
         'Kings': '/images/kings.png',
-        'Spurs': '/images/spurs.png'
+        'Spurs': '/images/spurs.png',
+        'Pistons': '/images/pistons.png',
+        'Magic': '/images/magic.png',
+        'Rockets': '/images/rockets.png',
+        'Trail Blazers': '/images/trailblazers.png'
     };
 
     const mvpCandidates = {
@@ -84,19 +102,22 @@ function populateMatchups(conferenceFinalsData) {
         'Pelicans': 'Zion Williamson',
         'Jazz': 'Lauri Markkanen',
         'Kings': 'De’Aaron Fox',
-        'Spurs': 'Victor Wembanyama'
+        'Spurs': 'Victor Wembanyama',
+        'Pistons': 'Cade Cunningham',
+        'Magic': 'Paolo Banchero',
+        'Rockets': 'Jalen Green',
+        'Trail Blazers': 'Anfernee Simons'
     };
 
     const teams = [conferenceFinalsData['east-final-winner'], conferenceFinalsData['west-final-winner']];
 
-    // Populate matchup logos
     document.getElementById('finals-team1-logo').src = teamLogos[teams[0]] || '/images/default.png';
     document.getElementById('finals-team1-logo').alt = `${teams[0]} Logo`;
     document.getElementById('finals-team2-logo').src = teamLogos[teams[1]] || '/images/default.png';
     document.getElementById('finals-team2-logo').alt = `${teams[1]} Logo`;
 
-    // Populate champion dropdown
     const winnerSelect = document.getElementById('finals-winner');
+    winnerSelect.innerHTML = '<option value="" disabled selected>Select CHAMPION</option>';
     teams.forEach(team => {
         const option = document.createElement('option');
         option.value = team;
@@ -104,8 +125,8 @@ function populateMatchups(conferenceFinalsData) {
         winnerSelect.appendChild(option);
     });
 
-    // Populate MVP dropdown
     const mvpSelect = document.getElementById('finals-mvp');
+    mvpSelect.innerHTML = '<option value="" disabled selected>Select MVP</option>';
     teams.forEach(team => {
         const player = mvpCandidates[team];
         if (player) {
@@ -116,7 +137,6 @@ function populateMatchups(conferenceFinalsData) {
         }
     });
 
-    // Update score placeholders
     document.getElementById('finals-score-team1').placeholder = `${teams[0]} Score`;
     document.getElementById('finals-score-team2').placeholder = `${teams[1]} Score`;
 }
@@ -146,26 +166,26 @@ function submitFinals() {
 
     fetch('/submit-finals', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ finals: winners })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ finals: winners }),
+        credentials: 'include',
+        mode: 'cors'
     })
-    .then(response => {
-        console.log('Fetch /submit-finals response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Submit response:', data);
-        if (data.error) {
-            alert('Error: ' + data.error);
-        } else {
-            alert('Finals submitted successfully!');
-            window.location.href = '/summary.html';
-        }
-    })
-    .catch(error => {
-        console.error('Error submitting Finals data:', error);
-        alert('An error occurred. Please try again.');
-    });
+        .then(response => {
+            console.log('POST /submit-finals response:', response.status);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Submit response:', data);
+            if (data.error) alert(`Error: ${data.error}`);
+            else {
+                alert('Finals submitted successfully!');
+                window.location.href = '/summary.html';
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting Finals data:', error);
+            alert('An error occurred. Please try again.');
+        });
 }

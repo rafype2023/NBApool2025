@@ -1,7 +1,14 @@
-document.addEventListener('DOMContentLoaded', () => {
+\document.addEventListener('DOMContentLoaded', () => {
     console.log('Conference Finals page loaded');
-    fetch('/get-playin')
-        .then(response => response.json())
+    fetch('/get-playin', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors'
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             if (data.error || !data.east7 || !data.east8 || !data.west7 || !data.west8) {
                 alert('Please complete the Play-In step first.');
@@ -18,8 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchSemifinalsData() {
-    fetch('/get-semifinals')
-        .then(response => response.json())
+    fetch('/get-semifinals', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors'
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             console.log('Semifinals data:', data);
             if (!data['east-match1-winner'] || !data['east-match2-winner'] || !data['west-match1-winner'] || !data['west-match2-winner']) {
@@ -59,7 +73,11 @@ function populateMatchups(semifinalsData) {
         'Pelicans': '/images/pelicans.png',
         'Jazz': '/images/jazz.png',
         'Kings': '/images/kings.png',
-        'Spurs': '/images/spurs.png'
+        'Spurs': '/images/spurs.png',
+        'Pistons': '/images/pistons.png',
+        'Magic': '/images/magic.png',
+        'Rockets': '/images/rockets.png',
+        'Trail Blazers': '/images/trailblazers.png'
     };
 
     const matchups = [
@@ -68,15 +86,14 @@ function populateMatchups(semifinalsData) {
     ];
 
     matchups.forEach(matchup => {
-        // Populate logos
         document.getElementById(matchup.logos[0]).src = teamLogos[matchup.teams[0]] || '/images/default.png';
         document.getElementById(matchup.logos[0]).alt = `${matchup.teams[0]} Logo`;
         document.getElementById(matchup.logos[1]).src = teamLogos[matchup.teams[1]] || '/images/default.png';
         document.getElementById(matchup.logos[1]).alt = `${matchup.teams[1]} Logo`;
 
-        // Populate dropdown
         const select = document.getElementById(matchup.id);
         if (select) {
+            select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
             matchup.teams.forEach(team => {
                 const option = document.createElement('option');
                 option.value = team;
@@ -105,26 +122,26 @@ function submitConferenceFinals() {
 
     fetch('/submit-conferencefinals', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ conferenceFinals: winners })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conferenceFinals: winners }),
+        credentials: 'include',
+        mode: 'cors'
     })
-    .then(response => {
-        console.log('Fetch /submit-conferencefinals response status:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Submit response:', data);
-        if (data.error) {
-            alert('Error: ' + data.error);
-        } else {
-            alert('Conference Finals submitted successfully!');
-            window.location.href = '/finals.html';
-        }
-    })
-    .catch(error => {
-        console.error('Error submitting Conference Finals data:', error);
-        alert('An error occurred. Please try again.');
-    });
+        .then(response => {
+            console.log('POST /submit-conferencefinals response:', response.status);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Submit response:', data);
+            if (data.error) alert(`Error: ${data.error}`);
+            else {
+                alert('Conference Finals submitted successfully!');
+                window.location.href = '/finals.html';
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting Conference Finals data:', error);
+            alert('An error occurred. Please try again.');
+        });
 }

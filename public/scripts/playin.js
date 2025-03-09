@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Play-In page loaded with Super Grok optimization');
     fetch('/get-playin', {
         method: 'GET',
-        credentials: 'include', // Force sending session cookie
-        mode: 'cors' // Explicitly set CORS mode
+        credentials: 'include',
+        mode: 'cors'
     })
         .then(response => {
             console.log('GET /get-playin response:', response.status, response.headers);
@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => {
             console.error('Fetch error for /get-playin:', error);
             alert('Failed to load Play-In data. Please ensure you’re registered or contact support.');
-            populateDropdowns(); // Fallback to populate empty dropdowns
+            window.location.href = '/';
+            populateDropdowns();
         });
 
     const playinForm = document.getElementById('playin-form');
@@ -48,7 +49,7 @@ function populateDropdowns() {
             console.error(`Select element with id '${id}' not found`);
             return;
         }
-        select.innerHTML = ''; // Clear existing options
+        select.innerHTML = '<option value="" disabled selected>Select Seed</option>';
         const teams = id.startsWith('east') ? eastTeams : westTeams;
         teams.forEach(team => {
             const option = document.createElement('option');
@@ -86,11 +87,11 @@ function submitPlayin(event) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-        credentials: 'include', // Force sending session cookie
-        mode: 'cors' // Explicitly set CORS mode
+        credentials: 'include',
+        mode: 'cors'
     })
         .then(response => {
-            console.log('POST /submit-playin response:', response.status, response.headers);
+            console.log('POST /submit-playin response:', response.status);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })

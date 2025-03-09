@@ -15,32 +15,38 @@
     <div class="container">
         <h2>Step 2 of 7</h2>
         <h3>PLAY-IN TOURNAMENT SELECTION</h3>
-        <h4>EASTERN CONFERENCE PLAY-IN:</h4>
-        <div class="form-group">
-            <select id="east7" name="east7" required>
-                <option value="" disabled selected>Select No. 7 Seed</option>
-            </select>
-            <select id="east8" name="east8" required>
-                <option value="" disabled selected>Select No. 8 Seed</option>
-            </select>
-        </div>
+        <form id="playin-form">
+            <h4>EASTERN CONFERENCE PLAY-IN:</h4>
+            <div class="form-group">
+                <label for="east7">Select No. 7 Seed:</label>
+                <select id="east7" name="east7" required>
+                    <option value="" disabled selected>Select No. 7 Seed</option>
+                </select>
+                <label for="east8">Select No. 8 Seed:</label>
+                <select id="east8" name="east8" required>
+                    <option value="" disabled selected>Select No. 8 Seed</option>
+                </select>
+            </div>
 
-        <h4>WESTERN CONFERENCE PLAY-IN:</h4>
-        <div class="form-group">
-            <select id="west7" name="west7" required>
-                <option value="" disabled selected>Select No. 7 Seed</option>
-            </select>
-            <select id="west8" name="west8" required>
-                <option value="" disabled selected>Select No. 8 Seed</option>
-            </select>
-        </div>
+            <h4>WESTERN CONFERENCE PLAY-IN:</h4>
+            <div class="form-group">
+                <label for="west7">Select No. 7 Seed:</label>
+                <select id="west7" name="west7" required>
+                    <option value="" disabled selected>Select No. 7 Seed</option>
+                </select>
+                <label for="west8">Select No. 8 Seed:</label>
+                <select id="west8" name="west8" required>
+                    <option value="" disabled selected>Select No. 8 Seed</option>
+                </select>
+            </div>
 
-        <div class="button-group">
-            <button onclick="window.location.href='/';">Previous</button>
-            <button onclick="submitPlayin()">Next</button>
-        </div>
+            <div class="button-group">
+                <button type="button" onclick="window.location.href='/';">Previous</button>
+                <button type="submit">Next</button>
+            </div>
+        </form>
     </div>
 
-    <script src="/scripts/playin.js"></script>
+    <script src="/scripts/playin.js" defer></script>
 </body>
 </html>
