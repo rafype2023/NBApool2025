@@ -1,145 +1,88 @@
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('First Round East page loaded with Super Grok optimization');
-    fetch('/get-firstround-east', {
-        method: 'GET',
-        credentials: 'include',
-        mode: 'cors'
-    })
-        .then(response => {
-            console.log('GET /get-firstround-east response:', response.status, response.headers);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log('First Round East data received:', data);
-            if (data.error) {
-                alert(`Error: ${data.error}. Redirecting to registration.`);
-                window.location.href = '/';
-                return;
-            }
-            const teamImages = {
-                'Cleveland': 'cavaliers.png',
-                'Boston': 'celtics.png',
-                'New York Knicks': 'knicks.png',
-                'Milwaukee': 'bucks.png',
-                'Magic': 'magic.png',
-                'Pistons': 'pistons.png',
-                'Detroit': 'pistons.png',
-                'Indiana': 'pacers.png'
-            };
-            document.getElementById('matchup1-opponent').textContent = data.playin.east8;
-            document.getElementById('matchup1-opponent-img').src = `/images/${teamImages[data.playin.east8] || 'placeholder.png'}`;
-            document.getElementById('matchup1-opponent-img').alt = data.playin.east8;
-            document.getElementById('matchup2-opponent').textContent = data.playin.east7;
-            document.getElementById('matchup2-opponent-img').src = `/images/${teamImages[data.playin.east7] || 'placeholder.png'}`;
-            document.getElementById('matchup2-opponent-img').alt = data.playin.east7;
-            document.getElementById('matchup3-opponent').textContent = 'Detroit';
-            document.getElementById('matchup3-opponent-img').src = '/images/pistons.png';
-            document.getElementById('matchup4-opponent').textContent = 'Indiana';
-            document.getElementById('matchup4-opponent-img').src = '/images/pacers.png';
-            const matchups = {
-                matchup1: ['Cleveland', data.playin.east8],
-                matchup2: ['Boston', data.playin.east7],
-                matchup3: ['New York Knicks', 'Detroit'],
-                matchup4: ['Milwaukee', 'Indiana']
-            };
-            const allElementsFound = populateDropdowns(matchups);
-            if (!allElementsFound) {
-                alert('Form error. Some elements are missing. Refresh or contact support.');
-                return;
-            }
-            ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
-                const select = document.getElementById(id);
-                if (select) select.value = data.firstRoundEast[id] || '';
-            });
-            ['series1', 'series2', 'series3', 'series4'].forEach(id => {
-                const select = document.getElementById(id);
-                if (select) select.value = data.firstRoundEast[id] || '';
-            });
-        })
-        .catch(error => {
-            console.error('Fetch error for /get-firstround-east:', error);
-            alert('Failed to load First Round East data. Please ensure you’re registered or contact support.');
-            window.location.href = '/';
-        });
-
-    const firstRoundEastForm = document.getElementById('firstround-east-form');
-    if (!firstRoundEastForm) {
-        console.error('First Round East form not found. Check if id="firstround-east-form" exists.');
-        alert('Form error. Refresh or contact support.');
-        return;
-    }
-    firstRoundEastForm.addEventListener('submit', submitFirstRoundEast);
-});
-
-function populateDropdowns(matchups) {
-    let allElementsFound = true;
-    ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
-        const select = document.getElementById(id);
-        if (!select) {
-            console.error(`Select element with id '${id}' not found`);
-            allElementsFound = false;
-            return;
-        }
-        select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
-        const teams = matchups[id];
-        if (teams) {
-            teams.forEach(team => {
-                const option = document.createElement('option');
-                option.value = team;
-                option.textContent = team;
-                select.appendChild(option);
-            });
-        } else {
-            console.error(`No teams defined for matchup '${id}'`);
-            allElementsFound = false;
-        }
-    });
-    return allElementsFound;
-}
-
-function submitFirstRoundEast(event) {
-    event.preventDefault();
-    const formData = {
-        matchup1: document.getElementById('matchup1')?.value || '',
-        matchup2: document.getElementById('matchup2')?.value || '',
-        matchup3: document.getElementById('matchup3')?.value || '',
-        matchup4: document.getElementById('matchup4')?.value || '',
-        series1: document.getElementById('series1')?.value || '',
-        series2: document.getElementById('series2')?.value || '',
-        series3: document.getElementById('series3')?.value || '',
-        series4: document.getElementById('series4')?.value || ''
-    };
-
-    if (!formData.matchup1 || !formData.matchup2 || !formData.matchup3 || !formData.matchup4 ||
-        !formData.series1 || !formData.series2 || !formData.series3 || !formData.series4) {
-        alert('Please select all winners and series lengths.');
-        return;
-    }
-
-    console.log('Submitting First Round East data:', formData);
-    fetch('/submit-firstround-east', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstRoundEast: formData }),
-        credentials: 'include',
-        mode: 'cors'
-    })
-        .then(response => {
-            console.log('POST /submit-firstround-east response:', response.status);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Submit response:', data);
-            if (data.error) alert(`Error: ${data.error}`);
-            else {
-                alert('First Round East data saved successfully!');
-                window.location.href = '/firstround_west.html';
-            }
-        })
-        .catch(error => {
-            console.error('Submit error for /submit-firstround-east:', error);
-            alert('Failed to save First Round East data. Please try again or contact support.');
-        });
-}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pool NBA 2025 - First Round East</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <div class="container">
+        <img src="/images/nba-pool-logo.png" alt="NBA Pool Logo" class="logo" loading="lazy">
+        <h1>BIENVENIDOS AL POOL NBA 2025</h1>
+        <h2>FIRST ROUND - EASTERN CONFERENCE</h2>
+        <form id="firstround-east-form">
+            <div class="matchup">
+                <img src="/images/cavaliers.png" alt="Cleveland Cavaliers" loading="lazy"> vs. 
+                <span class="opponent">
+                    <img id="matchup1-opponent-img" src="/images/placeholder.png" alt="8th Seed" loading="lazy">
+                    <span id="matchup1-opponent">8th Seed</span>
+                </span>
+                <select name="matchup1" id="matchup1">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+                <select name="series1" id="series1">
+                    <option value="" disabled selected>Select SERIES LENGTH</option>
+                    <option value="4-0">4-0</option>
+                    <option value="4-1">4-1</option>
+                    <option value="4-2">4-2</option>
+                    <option value="4-3">4-3</option>
+                </select>
+            </div>
+            <div class="matchup">
+                <img src="/images/celtics.png" alt="Boston Celtics" loading="lazy"> vs. 
+                <span class="opponent">
+                    <img id="matchup2-opponent-img" src="/images/placeholder.png" alt="7th Seed" loading="lazy">
+                    <span id="matchup2-opponent">7th Seed</span>
+                </span>
+                <select name="matchup2" id="matchup2">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+                <select name="series2" id="series2">
+                    <option value="" disabled selected>Select SERIES LENGTH</option>
+                    <option value="4-0">4-0</option>
+                    <option value="4-1">4-1</option>
+                    <option value="4-2">4-2</option>
+                    <option value="4-3">4-3</option>
+                </select>
+            </div>
+            <div class="matchup">
+                <img src="/images/knicks.png" alt="New York Knicks" loading="lazy"> vs. 
+                <span class="opponent">
+                    <img id="matchup3-opponent-img" src="/images/pistons.png" alt="Detroit Pistons" loading="lazy">
+                    <span id="matchup3-opponent">Detroit</span>
+                </span>
+                <select name="matchup3" id="matchup3">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+                <select name="series3" id="series3">
+                    <option value="" disabled selected>Select SERIES LENGTH</option>
+                    <option value="4-0">4-0</option>
+                    <option value="4-1">4-1</option>
+                    <option value="4-2">4-2</option>
+                    <option value="4-3">4-3</option>
+                </select>
+            </div>
+            <div class="matchup">
+                <img src="/images/bucks.png" alt="Milwaukee Bucks" loading="lazy"> vs. 
+                <span class="opponent">
+                    <img id="matchup4-opponent-img" src="/images/pacers.png" alt="Indiana Pacers" loading="lazy">
+                    <span id="matchup4-opponent">Indiana</span>
+                </span>
+                <select name="matchup4" id="matchup4">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+                <select name="series4" id="series4">
+                    <option value="" disabled selected>Select SERIES LENGTH</option>
+                    <option value="4-0">4-0</option>
+                    <option value="4-1">4-1</option>
+                    <option value="4-2">4-2</option>
+                    <option value="4-3">4-3</option>
+                </select>
+            </div>
+            <button type="button" onclick="window.location.href='/playin.html'">Previous</button>
+            <button type="submit">Next</button>
+        </form>
+    </div>
+    <script src="/scripts/firstround_east.js"></script>
+</html>
