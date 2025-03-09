@@ -91,7 +91,8 @@ const userSchema = new mongoose.Schema({
     finals: {
         champion: String,
         mvp: String,
-        finalScore: String
+        finalScore: String,
+	seriesLength: String
     }
 });
 
