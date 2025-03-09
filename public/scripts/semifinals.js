@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = data.error.includes('First Round') ? '/firstround_west.html' : '/';
                 return;
             }
+            // Map team names to image file names (nicknames)
             const teamImages = {
                 'Cleveland': 'cavaliers.png',
                 'Boston': 'celtics.png',
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Houston': 'rockets.png',
                 'Golden State': 'warriors.png'
             };
+            // Set Eastern Conference Semifinals
             const eastMatchup1Team1 = data.firstRoundEast.matchup1 || 'Winner 1 vs 8';
             const eastMatchup1Team2 = data.firstRoundEast.matchup4 || 'Winner 4 vs 5';
             const eastMatchup2Team1 = data.firstRoundEast.matchup2 || 'Winner 2 vs 7';
@@ -49,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('east2-team2').querySelector('span').textContent = eastMatchup2Team2;
             document.getElementById('east2-team2').querySelector('img').src = `/images/${teamImages[eastMatchup2Team2] || 'placeholder.png'}`;
             document.getElementById('east2-team2').querySelector('img').alt = eastMatchup2Team2;
+            // Set Western Conference Semifinals
             const westMatchup1Team1 = data.firstRoundWest.matchup1 || 'Winner 1 vs 8';
             const westMatchup1Team2 = data.firstRoundWest.matchup4 || 'Winner 4 vs 5';
             const westMatchup2Team1 = data.firstRoundWest.matchup2 || 'Winner 2 vs 7';
@@ -65,19 +68,21 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('west2-team2').querySelector('span').textContent = westMatchup2Team2;
             document.getElementById('west2-team2').querySelector('img').src = `/images/${teamImages[westMatchup2Team2] || 'placeholder.png'}`;
             document.getElementById('west2-team2').querySelector('img').alt = westMatchup2Team2;
+            // Define matchups for dropdowns
             const matchups = {
                 east1: [eastMatchup1Team1, eastMatchup1Team2],
                 east2: [eastMatchup2Team1, eastMatchup2Team2],
                 west1: [westMatchup1Team1, westMatchup1Team2],
                 west2: [westMatchup2Team1, westMatchup2Team2]
             };
-            console.log('Matchups defined:', matchups);
+            console.log('Matchups defined:', matchups); // Debug log
+            // Populate winner dropdowns
             ['east1', 'east2', 'west1', 'west2'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
                     select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
                     const teams = matchups[id].filter(team => team && team !== 'Winner 1 vs 8' && team !== 'Winner 2 vs 7' && team !== 'Winner 3 vs 6' && team !== 'Winner 4 vs 5');
-                    console.log(`Populating ${id} with teams:`, teams);
+                    console.log(`Populating ${id} with teams:`, teams); // Debug log
                     if (teams.length === 2) {
                         teams.forEach(team => {
                             const option = document.createElement('option');
@@ -89,11 +94,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.warn(`Invalid team count for ${id}:`, teams);
                     }
                     select.value = data.semifinals[id] || '';
+                } else {
+                    console.error(`Select element with id '${id}' not found`);
                 }
             });
+            // Populate series length dropdowns
             ['eastSeries1', 'eastSeries2', 'westSeries1', 'westSeries2'].forEach(id => {
                 const select = document.getElementById(id);
-                if (select) select.value = data.semifinals[id] || '';
+                if (select) {
+                    console.log(`Populating ${id} with series options`); // Debug log
+                    select.innerHTML = '<option value="" disabled selected>Select SERIES LENGTH</option>';
+                    ['4-0', '4-1', '4-2', '4-3'].forEach(series => {
+                        const option = document.createElement('option');
+                        option.value = series;
+                        option.textContent = series;
+                        select.appendChild(option);
+                    });
+                    select.value = data.semifinals[id] || '';
+                } else {
+                    console.error(`Select element with id '${id}' not found`);
+                }
             });
         })
         .catch(error => {
