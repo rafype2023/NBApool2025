@@ -390,6 +390,45 @@ app.post('/submit-conferencefinals', async (req, res) => {
     }
 });
 
+app.get('/get-finals', async (req, res) => {
+    console.log('Get Finals request:', { 
+        sessionId: req.sessionID, 
+        userId: req.session.userId, 
+        session: req.session 
+    });
+    console.log('Session Cookie from Request:', req.headers.cookie || 'none');
+    if (!req.session.userId) {
+        console.warn('Unauthorized access to /get-finals - Session not found');
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            console.warn('User not found for ID:', req.session.userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        console.log('User data:', user); // Debug log
+        // Check if Conference Finals step is completed
+        const hasConferenceFinalsData = user.conferenceFinals && 
+            user.conferenceFinals.eastWinner && user.conferenceFinals.westWinner;
+        if (!hasConferenceFinalsData) {
+            console.warn('Conference Finals step not completed for user:', req.session.userId);
+            return res.status(400).json({ error: 'Please complete the Conference Finals step first' });
+        }
+        const defaultData = { champion: '' };
+        const finalsData = user.finals ? { ...defaultData, ...user.finals } : defaultData;
+        const responseData = {
+            finals: finalsData,
+            conferenceFinals: user.conferenceFinals || {}
+        };
+        console.log('Returning Finals data:', responseData);
+        res.json(responseData);
+    } catch (error) {
+        console.error('Error fetching Finals data:', error);
+        res.status(500).json({ error: 'Server error fetching Finals data' });
+    }
+});
+
 app.post('/submit-finals', async (req, res) => {
     console.log('Submit Finals request:', { sessionId: req.sessionID, userId: req.session.userId, body: req.body });
     if (!req.session.userId) {
@@ -402,6 +441,7 @@ app.post('/submit-finals', async (req, res) => {
             { new: true, runValidators: true }
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
+        console.log('Updated Finals data for user:', user.finals);
         res.json({ message: 'Finals data saved successfully' });
     } catch (error) {
         console.error('Error saving Finals data:', error);
