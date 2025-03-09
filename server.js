@@ -471,6 +471,46 @@ app.post('/submit-finals', async (req, res) => {
         res.status(500).json({ error: 'Server error saving Finals data' });
     }
 });
+// Add this route below the Finals routes in server.js
+
+app.get('/get-summary', async (req, res) => {
+    console.log('Get Summary request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    console.log('Session Cookie from Request:', req.headers.cookie || 'none');
+    if (!req.session.userId) {
+        console.warn('Unauthorized access to /get-summary - Session not found');
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            console.warn('User not found for ID:', req.session.userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        console.log('User data for summary:', user);
+        const responseData = {
+            personalData: {
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                comments: user.comments || '',
+                paymentMethod: user.paymentMethod || ''
+            },
+            selections: {
+                playin: user.playin || {},
+                firstRoundEast: user.firstRoundEast || {},
+                firstRoundWest: user.firstRoundWest || {},
+                semifinals: user.semifinals || {},
+                conferenceFinals: user.conferenceFinals || {},
+                finals: user.finals || {}
+            }
+        };
+        console.log('Returning Summary data:', responseData);
+        res.json(responseData);
+    } catch (error) {
+        console.error('Error fetching Summary data:', error);
+        res.status(500).json({ error: 'Server error fetching Summary data' });
+    }
+});
 
 // Start server
 const PORT = process.env.PORT || 3000;

@@ -1,71 +1,100 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pool NBA 2025 - Summary</title>
-    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/style.css">
+    <style>
+        .summary-section {
+            margin: 20px 0;
+        }
+        .summary-section h3 {
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .summary-section p {
+            margin: 5px 0;
+        }
+        .summary-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .summary-section li {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="header">
-        <img src="/images/nba-pool-logo.png" alt="Pool NBA Logo" class="logo">
-        <h1>BIENVENIDOS AL <span>POOL NBA</span> 2025</h1>
-    </div>
-
     <div class="container">
-        <h2>SUMMARY OF YOUR PICKS</h2>
-        <h3>Play-In</h3>
-        <div class="summary-section">
-            <p><strong>Eastern Conference 7th Seed:</strong> <span id="playin-east7"></span></p>
-            <p><strong>Eastern Conference 8th Seed:</strong> <span id="playin-east8"></span></p>
-            <p><strong>Western Conference 7th Seed:</strong> <span id="playin-west7"></span></p>
-            <p><strong>Western Conference 8th Seed:</strong> <span id="playin-west8"></span></p>
+        <img src="/images/nba-pool-logo.png" alt="NBA Pool Logo" class="logo" loading="lazy">
+        <h1>BIENVENIDOS AL POOL NBA 2025</h1>
+        <h2>SUMMARY OF YOUR SELECTIONS</h2>
+        <div id="summary-content">
+            <div class="summary-section">
+                <h3>Personal Information</h3>
+                <p><strong>Name:</strong> <span id="name"></span></p>
+                <p><strong>Email:</strong> <span id="email"></span></p>
+                <p><strong>Phone:</strong> <span id="phone"></span></p>
+                <p><strong>Comments:</strong> <span id="comments"></span></p>
+                <p><strong>Payment Method:</strong> <span id="paymentMethod"></span></p>
+            </div>
+            <div class="summary-section">
+                <h3>Play-In Selections</h3>
+                <ul>
+                    <li>East 7th Seed: <span id="playin-east7"></span></li>
+                    <li>East 8th Seed: <span id="playin-east8"></span></li>
+                    <li>West 7th Seed: <span id="playin-west7"></span></li>
+                    <li>West 8th Seed: <span id="playin-west8"></span></li>
+                </ul>
+            </div>
+            <div class="summary-section">
+                <h3>First Round East Selections</h3>
+                <ul>
+                    <li>Matchup 1 (Cleveland vs. 8th Seed): <span id="firstRoundEast-matchup1"></span>, Series: <span id="firstRoundEast-series1"></span></li>
+                    <li>Matchup 2 (Boston vs. 7th Seed): <span id="firstRoundEast-matchup2"></span>, Series: <span id="firstRoundEast-series2"></span></li>
+                    <li>Matchup 3 (New York Knicks vs. Detroit): <span id="firstRoundEast-matchup3"></span>, Series: <span id="firstRoundEast-series3"></span></li>
+                    <li>Matchup 4 (Milwaukee vs. Indiana): <span id="firstRoundEast-matchup4"></span>, Series: <span id="firstRoundEast-series4"></span></li>
+                </ul>
+            </div>
+            <div class="summary-section">
+                <h3>First Round West Selections</h3>
+                <ul>
+                    <li>Matchup 1 (OKC vs. 8th Seed): <span id="firstRoundWest-matchup1"></span>, Series: <span id="firstRoundWest-series1"></span></li>
+                    <li>Matchup 2 (Denver vs. 7th Seed): <span id="firstRoundWest-matchup2"></span>, Series: <span id="firstRoundWest-series2"></span></li>
+                    <li>Matchup 3 (Los Angeles vs. Golden State): <span id="firstRoundWest-matchup3"></span>, Series: <span id="firstRoundWest-series3"></span></li>
+                    <li>Matchup 4 (Memphis vs. Houston): <span id="firstRoundWest-matchup4"></span>, Series: <span id="firstRoundWest-series4"></span></li>
+                </ul>
+            </div>
+            <div class="summary-section">
+                <h3>Semifinals Selections</h3>
+                <ul>
+                    <li>East 1: <span id="semifinals-east1"></span>, Series: <span id="semifinals-eastSeries1"></span></li>
+                    <li>East 2: <span id="semifinals-east2"></span>, Series: <span id="semifinals-eastSeries2"></span></li>
+                    <li>West 1: <span id="semifinals-west1"></span>, Series: <span id="semifinals-westSeries1"></span></li>
+                    <li>West 2: <span id="semifinals-west2"></span>, Series: <span id="semifinals-westSeries2"></span></li>
+                </ul>
+            </div>
+            <div class="summary-section">
+                <h3>Conference Finals Selections</h3>
+                <ul>
+                    <li>Eastern Conference: <span id="conferenceFinals-eastWinner"></span>, Series: <span id="conferenceFinals-eastSeries"></span></li>
+                    <li>Western Conference: <span id="conferenceFinals-westWinner"></span>, Series: <span id="conferenceFinals-westSeries"></span></li>
+                </ul>
+            </div>
+            <div class="summary-section">
+                <h3>Finals Selections</h3>
+                <ul>
+                    <li>Champion: <span id="finals-champion"></span></li>
+                    <li>Series Length: <span id="finals-seriesLength"></span></li>
+                    <li>MVP: <span id="finals-mvp"></span></li>
+                    <li>Final Score: <span id="finals-finalScore"></span></li>
+                </ul>
+            </div>
         </div>
-
-        <h3>First Round - Eastern Conference</h3>
-        <div class="summary-section">
-            <p><strong>Match 1 Winner:</strong> <span id="firstRoundEast-match1-winner"></span></p>
-            <p><strong>Match 2 Winner:</strong> <span id="firstRoundEast-match2-winner"></span></p>
-            <p><strong>Match 3 Winner:</strong> <span id="firstRoundEast-match3-winner"></span></p>
-            <p><strong>Match 4 Winner:</strong> <span id="firstRoundEast-match4-winner"></span></p>
-        </div>
-
-        <h3>First Round - Western Conference</h3>
-        <div class="summary-section">
-            <p><strong>Match 1 Winner:</strong> <span id="firstRoundWest-match1-winner"></span></p>
-            <p><strong>Match 2 Winner:</strong> <span id="firstRoundWest-match2-winner"></span></p>
-            <p><strong>Match 3 Winner:</strong> <span id="firstRoundWest-match3-winner"></span></p>
-            <p><strong>Match 4 Winner:</strong> <span id="firstRoundWest-match4-winner"></span></p>
-        </div>
-
-        <h3>Semifinals</h3>
-        <div class="summary-section">
-            <p><strong>East Match 1 Winner:</strong> <span id="semifinals-east-match1-winner"></span></p>
-            <p><strong>East Match 2 Winner:</strong> <span id="semifinals-east-match2-winner"></span></p>
-            <p><strong>West Match 1 Winner:</strong> <span id="semifinals-west-match1-winner"></span></p>
-            <p><strong>West Match 2 Winner:</strong> <span id="semifinals-west-match2-winner"></span></p>
-        </div>
-
-        <h3>Conference Finals</h3>
-        <div class="summary-section">
-            <p><strong>Eastern Conference Winner:</strong> <span id="conferenceFinals-east-final-winner"></span></p>
-            <p><strong>Western Conference Winner:</strong> <span id="conferenceFinals-west-final-winner"></span></p>
-        </div>
-
-        <h3>Finals</h3>
-        <div class="summary-section">
-            <p><strong>Champion:</strong> <span id="finals-finals-winner"></span></p>
-            <p><strong>Number of Games:</strong> <span id="finals-finals-games"></span></p>
-            <p><strong>MVP:</strong> <span id="finals-finals-mvp"></span></p>
-            <p><strong>Final Score:</strong> <span id="finals-finals-score"></span></p>
-        </div>
-
-        <div class="button-group">
-            <button onclick="window.location.href='/';">Back to Home</button>
-            <button onclick="window.location.href='/logout';">Logout</button>
-        </div>
+        <button onclick="window.location.href='/finals.html'">Previous</button>
     </div>
-
-    <script src="/scripts/summary.js"></script>
+    <script src="/scripts/summary.js" defer></script>
 </body>
 </html>
