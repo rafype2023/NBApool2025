@@ -1,0 +1,65 @@
+body {
+    background: linear-gradient(to bottom, #a52a2a, #f4a460);
+    font-family: Arial, sans-serif;
+    color: #000;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+.logo {
+    width: 150px;
+    margin-bottom: 20px;
+}
+
+h1, h2 {
+    margin: 10px 0;
+}
+
+.matchup {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 15px 0;
+}
+
+.matchup img {
+    width: 50px;
+    height: 50px;
+}
+
+.matchup span {
+    margin: 0 10px;
+}
+
+.matchup select {
+    padding: 5px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

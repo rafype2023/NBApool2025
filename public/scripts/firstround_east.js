@@ -17,14 +17,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/';
                 return;
             }
-            // Define matchups based on NBA seeding and Play-In results
+            // Update opponent labels with Play-In results
+            document.getElementById('matchup1-opponent').textContent = data.playin.east8;
+            document.getElementById('matchup2-opponent').textContent = data.playin.east7;
+            document.getElementById('matchup3-opponent').textContent = '6th Seed';
+            document.getElementById('matchup4-opponent').textContent = 'Sixers';
+            // Define matchups
             const matchups = {
                 matchup1: ['Bucks', data.playin.east8], // 1st vs 8th
                 matchup2: ['Hawks', data.playin.east7], // 2nd vs 7th
                 matchup3: ['Celtics', '6th Seed'],      // 3rd vs 6th
                 matchup4: ['Knicks', 'Sixers']          // 4th vs 5th
             };
-            // Safely populate dropdowns with matchup-specific options
+            // Populate dropdowns
             const allElementsFound = populateDropdowns(matchups);
             if (!allElementsFound) {
                 alert('Form error. Some elements are missing. Refresh or contact support.');

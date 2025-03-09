@@ -56,7 +56,9 @@ app.use(session({
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+    maxAge: '1d' // Cache static files for 1 day
+}));
 
 // Debug Headers
 app.use((req, res, next) => {
@@ -166,6 +168,7 @@ app.get('/get-firstround-east', async (req, res) => {
         userId: req.session.userId, 
         session: req.session 
     });
+    console.log('Session Cookie from Request:', req.headers.cookie || 'none');
     if (!req.session.userId) {
         console.warn('Unauthorized access to /get-firstround-east - Session not found');
         return res.status(401).json({ error: 'Unauthorized: Please register first' });
@@ -176,9 +179,15 @@ app.get('/get-firstround-east', async (req, res) => {
             console.warn('User not found for ID:', req.session.userId);
             return res.status(404).json({ error: 'User not found' });
         }
-        // Ensure default structure even if firstRoundEast is undefined
         const defaultData = { matchup1: '', matchup2: '', matchup3: '', matchup4: '' };
-        const responseData = user.firstRoundEast ? { ...defaultData, ...user.firstRoundEast } : defaultData;
+        const playinData = user.playin || { east7: '7th Seed', east8: '8th Seed' };
+        const responseData = {
+            firstRoundEast: user.firstRoundEast ? { ...defaultData, ...user.firstRoundEast } : defaultData,
+            playin: {
+                east7: playinData.east7 || '7th Seed',
+                east8: playinData.east8 || '8th Seed'
+            }
+        };
         console.log('Returning First Round East data:', responseData);
         res.json(responseData);
     } catch (error) {
