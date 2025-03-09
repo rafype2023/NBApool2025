@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Semifinals data received:', data);
             if (data.error) {
                 alert(`${data.error}. Contact support if the issue persists.`);
-                window.location.href = '/firstround_west.html';
+                window.location.href = data.error.includes('First Round') ? '/firstround_west.html' : '/';
                 return;
             }
             // Map team names to image file names (nicknames)
@@ -36,45 +36,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Add more teams as needed based on Play-In possibilities
             };
             // Set Eastern Conference Semifinals
-            document.getElementById('east1-team1').querySelector('span').textContent = data.firstRoundEast.matchup1 || 'Winner 1 vs 8';
-            document.getElementById('east1-team1').querySelector('img').src = `/images/${teamImages[data.firstRoundEast.matchup1] || 'placeholder.png'}`;
-            document.getElementById('east1-team1').querySelector('img').alt = data.firstRoundEast.matchup1 || 'Winner 1 vs 8';
-            document.getElementById('east1-team2').querySelector('span').textContent = data.firstRoundEast.matchup4 || 'Winner 4 vs 5';
-            document.getElementById('east1-team2').querySelector('img').src = `/images/${teamImages[data.firstRoundEast.matchup4] || 'placeholder.png'}`;
-            document.getElementById('east1-team2').querySelector('img').alt = data.firstRoundEast.matchup4 || 'Winner 4 vs 5';
-            document.getElementById('east2-team1').querySelector('span').textContent = data.firstRoundEast.matchup2 || 'Winner 2 vs 7';
-            document.getElementById('east2-team1').querySelector('img').src = `/images/${teamImages[data.firstRoundEast.matchup2] || 'placeholder.png'}`;
-            document.getElementById('east2-team1').querySelector('img').alt = data.firstRoundEast.matchup2 || 'Winner 2 vs 7';
-            document.getElementById('east2-team2').querySelector('span').textContent = data.firstRoundEast.matchup3 || 'Winner 3 vs 6';
-            document.getElementById('east2-team2').querySelector('img').src = `/images/${teamImages[data.firstRoundEast.matchup3] || 'placeholder.png'}`;
-            document.getElementById('east2-team2').querySelector('img').alt = data.firstRoundEast.matchup3 || 'Winner 3 vs 6';
+            const eastMatchup1Team1 = data.firstRoundEast.matchup1 || 'Winner 1 vs 8';
+            const eastMatchup1Team2 = data.firstRoundEast.matchup4 || 'Winner 4 vs 5';
+            const eastMatchup2Team1 = data.firstRoundEast.matchup2 || 'Winner 2 vs 7';
+            const eastMatchup2Team2 = data.firstRoundEast.matchup3 || 'Winner 3 vs 6';
+            document.getElementById('east1-team1').querySelector('span').textContent = eastMatchup1Team1;
+            document.getElementById('east1-team1').querySelector('img').src = `/images/${teamImages[eastMatchup1Team1] || 'placeholder.png'}`;
+            document.getElementById('east1-team1').querySelector('img').alt = eastMatchup1Team1;
+            document.getElementById('east1-team2').querySelector('span').textContent = eastMatchup1Team2;
+            document.getElementById('east1-team2').querySelector('img').src = `/images/${teamImages[eastMatchup1Team2] || 'placeholder.png'}`;
+            document.getElementById('east1-team2').querySelector('img').alt = eastMatchup1Team2;
+            document.getElementById('east2-team1').querySelector('span').textContent = eastMatchup2Team1;
+            document.getElementById('east2-team1').querySelector('img').src = `/images/${teamImages[eastMatchup2Team1] || 'placeholder.png'}`;
+            document.getElementById('east2-team1').querySelector('img').alt = eastMatchup2Team1;
+            document.getElementById('east2-team2').querySelector('span').textContent = eastMatchup2Team2;
+            document.getElementById('east2-team2').querySelector('img').src = `/images/${teamImages[eastMatchup2Team2] || 'placeholder.png'}`;
+            document.getElementById('east2-team2').querySelector('img').alt = eastMatchup2Team2;
             // Set Western Conference Semifinals
-            document.getElementById('west1-team1').querySelector('span').textContent = data.firstRoundWest.matchup1 || 'Winner 1 vs 8';
-            document.getElementById('west1-team1').querySelector('img').src = `/images/${teamImages[data.firstRoundWest.matchup1] || 'placeholder.png'}`;
-            document.getElementById('west1-team1').querySelector('img').alt = data.firstRoundWest.matchup1 || 'Winner 1 vs 8';
-            document.getElementById('west1-team2').querySelector('span').textContent = data.firstRoundWest.matchup4 || 'Winner 4 vs 5';
-            document.getElementById('west1-team2').querySelector('img').src = `/images/${teamImages[data.firstRoundWest.matchup4] || 'placeholder.png'}`;
-            document.getElementById('west1-team2').querySelector('img').alt = data.firstRoundWest.matchup4 || 'Winner 4 vs 5';
-            document.getElementById('west2-team1').querySelector('span').textContent = data.firstRoundWest.matchup2 || 'Winner 2 vs 7';
-            document.getElementById('west2-team1').querySelector('img').src = `/images/${teamImages[data.firstRoundWest.matchup2] || 'placeholder.png'}`;
-            document.getElementById('west2-team1').querySelector('img').alt = data.firstRoundWest.matchup2 || 'Winner 2 vs 7';
-            document.getElementById('west2-team2').querySelector('span').textContent = data.firstRoundWest.matchup3 || 'Winner 3 vs 6';
-            document.getElementById('west2-team2').querySelector('img').src = `/images/${teamImages[data.firstRoundWest.matchup3] || 'placeholder.png'}`;
-            document.getElementById('west2-team2').querySelector('img').alt = data.firstRoundWest.matchup3 || 'Winner 3 vs 6';
-            // Populate dropdowns with possible winners
-            const allTeams = [
-                ...Object.keys(teamImages),
-                data.firstRoundEast.matchup1, data.firstRoundEast.matchup2,
-                data.firstRoundEast.matchup3, data.firstRoundEast.matchup4,
-                data.firstRoundWest.matchup1, data.firstRoundWest.matchup2,
-                data.firstRoundWest.matchup3, data.firstRoundWest.matchup4
-            ].filter(team => team); // Remove undefined values
+            const westMatchup1Team1 = data.firstRoundWest.matchup1 || 'Winner 1 vs 8';
+            const westMatchup1Team2 = data.firstRoundWest.matchup4 || 'Winner 4 vs 5';
+            const westMatchup2Team1 = data.firstRoundWest.matchup2 || 'Winner 2 vs 7';
+            const westMatchup2Team2 = data.firstRoundWest.matchup3 || 'Winner 3 vs 6';
+            document.getElementById('west1-team1').querySelector('span').textContent = westMatchup1Team1;
+            document.getElementById('west1-team1').querySelector('img').src = `/images/${teamImages[westMatchup1Team1] || 'placeholder.png'}`;
+            document.getElementById('west1-team1').querySelector('img').alt = westMatchup1Team1;
+            document.getElementById('west1-team2').querySelector('span').textContent = westMatchup1Team2;
+            document.getElementById('west1-team2').querySelector('img').src = `/images/${teamImages[westMatchup1Team2] || 'placeholder.png'}`;
+            document.getElementById('west1-team2').querySelector('img').alt = westMatchup1Team2;
+            document.getElementById('west2-team1').querySelector('span').textContent = westMatchup2Team1;
+            document.getElementById('west2-team1').querySelector('img').src = `/images/${teamImages[westMatchup2Team1] || 'placeholder.png'}`;
+            document.getElementById('west2-team1').querySelector('img').alt = westMatchup2Team1;
+            document.getElementById('west2-team2').querySelector('span').textContent = westMatchup2Team2;
+            document.getElementById('west2-team2').querySelector('img').src = `/images/${teamImages[westMatchup2Team2] || 'placeholder.png'}`;
+            document.getElementById('west2-team2').querySelector('img').alt = westMatchup2Team2;
+            // Populate dropdowns with only the two teams in each matchup
+            const matchups = {
+                east1: [eastMatchup1Team1, eastMatchup1Team2],
+                east2: [eastMatchup2Team1, eastMatchup2Team2],
+                west1: [westMatchup1Team1, westMatchup1Team2],
+                west2: [westMatchup2Team1, westMatchup2Team2]
+            };
             ['east1', 'east2', 'west1', 'west2'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
                     select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
-                    const uniqueTeams = [...new Set(allTeams)];
-                    uniqueTeams.forEach(team => {
+                    const teams = matchups[id].filter(team => team); // Remove undefined or empty values
+                    teams.forEach(team => {
                         const option = document.createElement('option');
                         option.value = team;
                         option.textContent = team;
