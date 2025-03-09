@@ -4,58 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pool NBA 2025 - Semifinals</title>
-    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/style.css">
 </head>
 <body>
-    <div class="header">
-        <img src="/images/nba-pool-logo.png" alt="Pool NBA Logo" class="logo">
-        <h1>BIENVENIDOS AL <span>POOL NBA</span> 2025</h1>
-    </div>
-
     <div class="container">
+        <img src="/images/nba-pool-logo.png" alt="NBA Pool Logo" class="logo" loading="lazy">
+        <h1>BIENVENIDOS AL POOL NBA 2025</h1>
         <h2>SEMIFINALS</h2>
-        <h3>EASTERN CONFERENCE</h3>
-        <div class="matchup">
-            <img src="/images/hawks.png" alt="Hawks Logo">
-            <span>vs.</span>
-            <img src="/images/celtics.png" alt="Celtics Logo">
-            <select id="east-match1-winner" name="east-match1-winner" class="winner-select" required>
-                <option value="" disabled selected>Select WINNER</option>
-            </select>
-        </div>
-        <div class="matchup">
-            <img src="/images/bucks.png" alt="Bucks Logo">
-            <span>vs.</span>
-            <img src="/images/sixers.png" alt="Sixers Logo">
-            <select id="east-match2-winner" name="east-match2-winner" class="winner-select" required>
-                <option value="" disabled selected>Select WINNER</option>
-            </select>
-        </div>
-
-        <h3>WESTERN CONFERENCE</h3>
-        <div class="matchup">
-            <img src="/images/lakers.png" alt="Lakers Logo">
-            <span>vs.</span>
-            <img src="/images/nuggets.png" alt="Nuggets Logo">
-            <select id="west-match1-winner" name="west-match1-winner" class="winner-select" required>
-                <option value="" disabled selected>Select WINNER</option>
-            </select>
-        </div>
-        <div class="matchup">
-            <img src="/images/warriors.png" alt="Warriors Logo">
-            <span>vs.</span>
-            <img src="/images/suns.png" alt="Suns Logo">
-            <select id="west-match2-winner" name="west-match2-winner" class="winner-select" required>
-                <option value="" disabled selected>Select WINNER</option>
-            </select>
-        </div>
-
-        <div class="button-group">
-            <button onclick="window.location.href='/firstround_west.html';">Previous</button>
-            <button onclick="submitSemifinals()">Next</button>
-        </div>
+        <form id="semifinals-form">
+            <h3>Eastern Conference Semifinals</h3>
+            <div class="matchup">
+                <span id="east1-team1" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 1" loading="lazy">
+                    <span>Winner 1 vs 8</span>
+                </span> vs. 
+                <span id="east1-team2" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 2" loading="lazy">
+                    <span>Winner 4 vs 5</span>
+                </span>
+                <select name="east1" id="east1">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+            </div>
+            <div class="matchup">
+                <span id="east2-team1" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 1" loading="lazy">
+                    <span>Winner 2 vs 7</span>
+                </span> vs. 
+                <span id="east2-team2" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 2" loading="lazy">
+                    <span>Winner 3 vs 6</span>
+                </span>
+                <select name="east2" id="east2">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+            </div>
+            <h3>Western Conference Semifinals</h3>
+            <div class="matchup">
+                <span id="west1-team1" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 1" loading="lazy">
+                    <span>Winner 1 vs 8</span>
+                </span> vs. 
+                <span id="west1-team2" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 2" loading="lazy">
+                    <span>Winner 4 vs 5</span>
+                </span>
+                <select name="west1" id="west1">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+            </div>
+            <div class="matchup">
+                <span id="west2-team1" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 1" loading="lazy">
+                    <span>Winner 2 vs 7</span>
+                </span> vs. 
+                <span id="west2-team2" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 2" loading="lazy">
+                    <span>Winner 3 vs 6</span>
+                </span>
+                <select name="west2" id="west2">
+                    <option value="" disabled selected>Select WINNER</option>
+                </select>
+            </div>
+            <button type="button" onclick="window.location.href='/firstround_west.html'">Previous</button>
+            <button type="submit">Next</button>
+        </form>
     </div>
-
     <script src="/scripts/semifinals.js"></script>
 </body>
 </html>

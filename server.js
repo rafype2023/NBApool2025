@@ -274,15 +274,37 @@ app.post('/submit-firstround-west', async (req, res) => {
 });
 
 app.get('/get-semifinals', async (req, res) => {
-    console.log('Get Semifinals request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    console.log('Get Semifinals request:', { 
+        sessionId: req.sessionID, 
+        userId: req.session.userId, 
+        session: req.session 
+    });
+    console.log('Session Cookie from Request:', req.headers.cookie || 'none');
     if (!req.session.userId) {
         console.warn('Unauthorized access to /get-semifinals - Session not found');
         return res.status(401).json({ error: 'Unauthorized: Please register first' });
     }
     try {
         const user = await User.findById(req.session.userId);
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json(user.semifinals || {});
+        if (!user) {
+            console.warn('User not found for ID:', req.session.userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        // Check if First Round steps are completed
+        if (!user.firstRoundEast || !user.firstRoundWest || 
+            !user.firstRoundEast.matchup1 || !user.firstRoundWest.matchup1) {
+            console.warn('First Round East or West not completed for user:', req.session.userId);
+            return res.status(400).json({ error: 'Please complete the First Round East and West steps first' });
+        }
+        const defaultData = { east1: '', east2: '', west1: '', west2: '' };
+        const semifinalsData = user.semifinals ? { ...defaultData, ...user.semifinals } : defaultData;
+        const responseData = {
+            semifinals: semifinalsData,
+            firstRoundEast: user.firstRoundEast || {},
+            firstRoundWest: user.firstRoundWest || {}
+        };
+        console.log('Returning Semifinals data:', responseData);
+        res.json(responseData);
     } catch (error) {
         console.error('Error fetching Semifinals data:', error);
         res.status(500).json({ error: 'Server error fetching Semifinals data' });

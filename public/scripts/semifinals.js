@@ -1,128 +1,123 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Semifinals page loaded');
-    fetch('/get-playin', {
+    console.log('Semifinals page loaded with Super Grok optimization');
+    fetch('/get-semifinals', {
         method: 'GET',
         credentials: 'include',
         mode: 'cors'
     })
         .then(response => {
+            console.log('GET /get-semifinals response:', response.status, response.headers);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then(data => {
-            if (data.error || !data.east7 || !data.east8 || !data.west7 || !data.west8) {
-                alert('Please complete the Play-In step first.');
-                window.location.href = '/playin.html';
+            console.log('Semifinals data received:', data);
+            if (data.error) {
+                alert(`${data.error}. Contact support if the issue persists.`);
+                window.location.href = '/firstround_west.html';
                 return;
             }
-            fetchFirstRoundData();
+            // Map team names to image file names (nicknames)
+            const teamImages = {
+                'Cleveland': 'cavaliers.png',
+                'Boston': 'celtics.png',
+                'New York Knicks': 'knicks.png',
+                'Milwaukee': 'bucks.png',
+                'Magic': 'magic.png',
+                'Pistons': 'pistons.png',
+                'Detroit': 'pistons.png',
+                'Indiana': 'pacers.png',
+                'OKC': 'thunder.png',
+                'Denver': 'nuggets.png',
+                'Los Angeles': 'lakers.png',
+                'Memphis': 'grizzlies.png',
+                'Houston': 'rockets.png',
+                'Golden State': 'warriors.png'
+                // Add more teams as needed based on Play-In possibilities
+            };
+            // Set Eastern Conference Semifinals
+            document.getElementById('east1-team1').querySelector('span').textContent = data.firstRoundEast.matchup1 || 'Winner 1 vs 8';
+            document.getElementById('east1-team1').querySelector('img').src = `/images/${teamImages[data.firstRoundEast.matchup1] || 'placeholder.png'}`;
+            document.getElementById('east1-team1').querySelector('img').alt = data.firstRoundEast.matchup1 || 'Winner 1 vs 8';
+            document.getElementById('east1-team2').querySelector('span').textContent = data.firstRoundEast.matchup4 || 'Winner 4 vs 5';
+            document.getElementById('east1-team2').querySelector('img').src = `/images/${teamImages[data.firstRoundEast.matchup4] || 'placeholder.png'}`;
+            document.getElementById('east1-team2').querySelector('img').alt = data.firstRoundEast.matchup4 || 'Winner 4 vs 5';
+            document.getElementById('east2-team1').querySelector('span').textContent = data.firstRoundEast.matchup2 || 'Winner 2 vs 7';
+            document.getElementById('east2-team1').querySelector('img').src = `/images/${teamImages[data.firstRoundEast.matchup2] || 'placeholder.png'}`;
+            document.getElementById('east2-team1').querySelector('img').alt = data.firstRoundEast.matchup2 || 'Winner 2 vs 7';
+            document.getElementById('east2-team2').querySelector('span').textContent = data.firstRoundEast.matchup3 || 'Winner 3 vs 6';
+            document.getElementById('east2-team2').querySelector('img').src = `/images/${teamImages[data.firstRoundEast.matchup3] || 'placeholder.png'}`;
+            document.getElementById('east2-team2').querySelector('img').alt = data.firstRoundEast.matchup3 || 'Winner 3 vs 6';
+            // Set Western Conference Semifinals
+            document.getElementById('west1-team1').querySelector('span').textContent = data.firstRoundWest.matchup1 || 'Winner 1 vs 8';
+            document.getElementById('west1-team1').querySelector('img').src = `/images/${teamImages[data.firstRoundWest.matchup1] || 'placeholder.png'}`;
+            document.getElementById('west1-team1').querySelector('img').alt = data.firstRoundWest.matchup1 || 'Winner 1 vs 8';
+            document.getElementById('west1-team2').querySelector('span').textContent = data.firstRoundWest.matchup4 || 'Winner 4 vs 5';
+            document.getElementById('west1-team2').querySelector('img').src = `/images/${teamImages[data.firstRoundWest.matchup4] || 'placeholder.png'}`;
+            document.getElementById('west1-team2').querySelector('img').alt = data.firstRoundWest.matchup4 || 'Winner 4 vs 5';
+            document.getElementById('west2-team1').querySelector('span').textContent = data.firstRoundWest.matchup2 || 'Winner 2 vs 7';
+            document.getElementById('west2-team1').querySelector('img').src = `/images/${teamImages[data.firstRoundWest.matchup2] || 'placeholder.png'}`;
+            document.getElementById('west2-team1').querySelector('img').alt = data.firstRoundWest.matchup2 || 'Winner 2 vs 7';
+            document.getElementById('west2-team2').querySelector('span').textContent = data.firstRoundWest.matchup3 || 'Winner 3 vs 6';
+            document.getElementById('west2-team2').querySelector('img').src = `/images/${teamImages[data.firstRoundWest.matchup3] || 'placeholder.png'}`;
+            document.getElementById('west2-team2').querySelector('img').alt = data.firstRoundWest.matchup3 || 'Winner 3 vs 6';
+            // Populate dropdowns with possible winners
+            const allTeams = [
+                ...Object.keys(teamImages),
+                data.firstRoundEast.matchup1, data.firstRoundEast.matchup2,
+                data.firstRoundEast.matchup3, data.firstRoundEast.matchup4,
+                data.firstRoundWest.matchup1, data.firstRoundWest.matchup2,
+                data.firstRoundWest.matchup3, data.firstRoundWest.matchup4
+            ].filter(team => team); // Remove undefined values
+            ['east1', 'east2', 'west1', 'west2'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
+                    const uniqueTeams = [...new Set(allTeams)];
+                    uniqueTeams.forEach(team => {
+                        const option = document.createElement('option');
+                        option.value = team;
+                        option.textContent = team;
+                        select.appendChild(option);
+                    });
+                    select.value = data.semifinals[id] || '';
+                }
+            });
         })
         .catch(error => {
-            console.error('Error fetching Play-In data:', error);
-            alert('Please complete the Play-In step first.');
-            window.location.href = '/playin.html';
+            console.error('Fetch error for /get-semifinals:', error);
+            alert('Failed to load Semifinals data. Please ensure you’re registered or contact support.');
+            window.location.href = '/';
         });
+
+    const semifinalsForm = document.getElementById('semifinals-form');
+    if (!semifinalsForm) {
+        console.error('Semifinals form not found. Check if id="semifinals-form" exists.');
+        alert('Form error. Refresh or contact support.');
+        return;
+    }
+    semifinalsForm.addEventListener('submit', submitSemifinals);
 });
 
-function fetchFirstRoundData() {
-    Promise.all([
-        fetch('/get-firstround-east', { credentials: 'include', mode: 'cors' }).then(res => res.json()),
-        fetch('/get-firstround-west', { credentials: 'include', mode: 'cors' }).then(res => res.json())
-    ])
-    .then(([eastData, westData]) => {
-        console.log('First Round East data:', eastData);
-        console.log('First Round West data:', westData);
-        if (!eastData['match1-winner'] || !eastData['match2-winner'] || !eastData['match3-winner'] || !eastData['match4-winner'] ||
-            !westData['match1-winner'] || !westData['match2-winner'] || !westData['match3-winner'] || !westData['match4-winner']) {
-            alert('Please complete the First Round steps first.');
-            window.location.href = '/firstround_east.html';
-            return;
-        }
-        populateMatchups(eastData, westData);
-    })
-    .catch(error => {
-        console.error('Error fetching First Round data:', error);
-        alert('Please complete the First Round steps first.');
-        window.location.href = '/firstround_east.html';
-    });
-}
-
-function populateMatchups(eastData, westData) {
-    const teamLogos = {
-        'Bucks': '/images/bucks.png',
-        'Heat': '/images/heat.png',
-        'Celtics': '/images/celtics.png',
-        'Pacers': '/images/pacers.png',
-        'Knicks': '/images/knicks.png',
-        'Sixers': '/images/sixers.png',
-        'Hawks': '/images/hawks.png',
-        'Bulls': '/images/bulls.png',
-        'Hornets': '/images/hornets.png',
-        'Wizards': '/images/wizards.png',
-        'Nets': '/images/nets.png',
-        'Raptors': '/images/raptors.png',
-        'Nuggets': '/images/nuggets.png',
-        'Suns': '/images/suns.png',
-        'Warriors': '/images/warriors.png',
-        'Mavericks': '/images/mavericks.png',
-        'Lakers': '/images/lakers.png',
-        'Clippers': '/images/clippers.png',
-        'Pelicans': '/images/pelicans.png',
-        'Jazz': '/images/jazz.png',
-        'Kings': '/images/kings.png',
-        'Spurs': '/images/spurs.png',
-        'Pistons': '/images/pistons.png',
-        'Magic': '/images/magic.png',
-        'Rockets': '/images/rockets.png',
-        'Trail Blazers': '/images/trailblazers.png'
+function submitSemifinals(event) {
+    event.preventDefault();
+    const formData = {
+        east1: document.getElementById('east1')?.value || '',
+        east2: document.getElementById('east2')?.value || '',
+        west1: document.getElementById('west1')?.value || '',
+        west2: document.getElementById('west2')?.value || ''
     };
 
-    const matchups = [
-        { id: 'east-match1-winner', teams: [eastData['match1-winner'], eastData['match4-winner']], logos: ['east-match1-team1-logo', 'east-match1-team2-logo'] },
-        { id: 'east-match2-winner', teams: [eastData['match2-winner'], eastData['match3-winner']], logos: ['east-match2-team1-logo', 'east-match2-team2-logo'] },
-        { id: 'west-match1-winner', teams: [westData['match1-winner'], westData['match4-winner']], logos: ['west-match1-team1-logo', 'west-match1-team2-logo'] },
-        { id: 'west-match2-winner', teams: [westData['match2-winner'], westData['match3-winner']], logos: ['west-match2-team1-logo', 'west-match2-team2-logo'] }
-    ];
-
-    matchups.forEach(matchup => {
-        document.getElementById(matchup.logos[0]).src = teamLogos[matchup.teams[0]] || '/images/default.png';
-        document.getElementById(matchup.logos[0]).alt = `${matchup.teams[0]} Logo`;
-        document.getElementById(matchup.logos[1]).src = teamLogos[matchup.teams[1]] || '/images/default.png';
-        document.getElementById(matchup.logos[1]).alt = `${matchup.teams[1]} Logo`;
-
-        const select = document.getElementById(matchup.id);
-        if (select) {
-            select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
-            matchup.teams.forEach(team => {
-                const option = document.createElement('option');
-                option.value = team;
-                option.textContent = team;
-                select.appendChild(option);
-            });
-        } else {
-            console.error(`Select element with id '${matchup.id}' not found`);
-        }
-    });
-}
-
-function submitSemifinals() {
-    const winners = {};
-    document.querySelectorAll('.winner-select').forEach(select => {
-        if (select.value) {
-            winners[select.id] = select.value;
-        }
-    });
-
-    console.log('Selected winners:', winners);
-    if (Object.keys(winners).length !== document.querySelectorAll('.winner-select').length) {
-        alert('Please select a winner for all matchups.');
+    if (!formData.east1 || !formData.east2 || !formData.west1 || !formData.west2) {
+        alert('Please select all winners.');
         return;
     }
 
+    console.log('Submitting Semifinals data:', formData);
     fetch('/submit-semifinals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ semifinals: winners }),
+        body: JSON.stringify({ semifinals: formData }),
         credentials: 'include',
         mode: 'cors'
     })
@@ -135,12 +130,12 @@ function submitSemifinals() {
             console.log('Submit response:', data);
             if (data.error) alert(`Error: ${data.error}`);
             else {
-                alert('Semifinals submitted successfully!');
+                alert('Semifinals data saved successfully!');
                 window.location.href = '/conferencefinals.html';
             }
         })
         .catch(error => {
-            console.error('Error submitting Semifinals data:', error);
-            alert('An error occurred. Please try again.');
+            console.error('Submit error for /submit-semifinals:', error);
+            alert('Failed to save Semifinals data. Please try again or contact support.');
         });
 }

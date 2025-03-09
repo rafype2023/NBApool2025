@@ -63,3 +63,15 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+/* Add this to the existing style.css */
+.team-with-logo {
+    display: flex;
+    align-items: center;
+}
+
+.team-with-logo img {
+    width: 50px;
+    height: 50px;
+    margin-right: 5px;
+}
