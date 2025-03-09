@@ -331,15 +331,39 @@ app.post('/submit-semifinals', async (req, res) => {
 });
 
 app.get('/get-conferencefinals', async (req, res) => {
-    console.log('Get Conference Finals request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    console.log('Get Conference Finals request:', { 
+        sessionId: req.sessionID, 
+        userId: req.session.userId, 
+        session: req.session 
+    });
+    console.log('Session Cookie from Request:', req.headers.cookie || 'none');
     if (!req.session.userId) {
         console.warn('Unauthorized access to /get-conferencefinals - Session not found');
         return res.status(401).json({ error: 'Unauthorized: Please register first' });
     }
     try {
         const user = await User.findById(req.session.userId);
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json(user.conferenceFinals || {});
+        if (!user) {
+            console.warn('User not found for ID:', req.session.userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        console.log('User data:', user); // Debug log
+        // Check if Semifinals step is completed
+        const hasSemifinalsData = user.semifinals && 
+            user.semifinals.east1 && user.semifinals.east2 && 
+            user.semifinals.west1 && user.semifinals.west2;
+        if (!hasSemifinalsData) {
+            console.warn('Semifinals step not completed for user:', req.session.userId);
+            return res.status(400).json({ error: 'Please complete the Semifinals step first' });
+        }
+        const defaultData = { eastWinner: '', westWinner: '' };
+        const conferenceFinalsData = user.conferenceFinals ? { ...defaultData, ...user.conferenceFinals } : defaultData;
+        const responseData = {
+            conferenceFinals: conferenceFinalsData,
+            semifinals: user.semifinals || {}
+        };
+        console.log('Returning Conference Finals data:', responseData);
+        res.json(responseData);
     } catch (error) {
         console.error('Error fetching Conference Finals data:', error);
         res.status(500).json({ error: 'Server error fetching Conference Finals data' });
@@ -358,6 +382,7 @@ app.post('/submit-conferencefinals', async (req, res) => {
             { new: true, runValidators: true }
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
+        console.log('Updated Conference Finals data for user:', user.conferenceFinals);
         res.json({ message: 'Conference Finals data saved successfully' });
     } catch (error) {
         console.error('Error saving Conference Finals data:', error);

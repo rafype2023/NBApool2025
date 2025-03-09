@@ -1,129 +1,117 @@
-\document.addEventListener('DOMContentLoaded', () => {
-    console.log('Conference Finals page loaded');
-    fetch('/get-playin', {
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Conference Finals page loaded with Super Grok optimization');
+    fetch('/get-conferencefinals', {
         method: 'GET',
         credentials: 'include',
         mode: 'cors'
     })
         .then(response => {
+            console.log('GET /get-conferencefinals response:', response.status, response.headers);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then(data => {
-            if (data.error || !data.east7 || !data.east8 || !data.west7 || !data.west8) {
-                alert('Please complete the Play-In step first.');
-                window.location.href = '/playin.html';
+            console.log('Conference Finals data received:', data);
+            if (data.error) {
+                alert(`${data.error}. Contact support if the issue persists.`);
+                window.location.href = data.error.includes('Semifinals') ? '/semifinals.html' : '/';
                 return;
             }
-            fetchSemifinalsData();
+            // Map team names to image file names (nicknames)
+            const teamImages = {
+                'Cleveland': 'cavaliers.png',
+                'Boston': 'celtics.png',
+                'New York Knicks': 'knicks.png',
+                'Milwaukee': 'bucks.png',
+                'Magic': 'magic.png',
+                'Pistons': 'pistons.png',
+                'Detroit': 'pistons.png',
+                'Indiana': 'pacers.png',
+                'OKC': 'thunder.png',
+                'Denver': 'nuggets.png',
+                'Los Angeles': 'lakers.png',
+                'Memphis': 'grizzlies.png',
+                'Houston': 'rockets.png',
+                'Golden State': 'warriors.png'
+                // Add more teams as needed based on Play-In possibilities
+            };
+            // Set Eastern Conference Finals
+            const eastTeam1 = data.semifinals.east1 || 'Winner East 1';
+            const eastTeam2 = data.semifinals.east2 || 'Winner East 2';
+            document.getElementById('east-team1').querySelector('span').textContent = eastTeam1;
+            document.getElementById('east-team1').querySelector('img').src = `/images/${teamImages[eastTeam1] || 'placeholder.png'}`;
+            document.getElementById('east-team1').querySelector('img').alt = eastTeam1;
+            document.getElementById('east-team2').querySelector('span').textContent = eastTeam2;
+            document.getElementById('east-team2').querySelector('img').src = `/images/${teamImages[eastTeam2] || 'placeholder.png'}`;
+            document.getElementById('east-team2').querySelector('img').alt = eastTeam2;
+            // Set Western Conference Finals
+            const westTeam1 = data.semifinals.west1 || 'Winner West 1';
+            const westTeam2 = data.semifinals.west2 || 'Winner West 2';
+            document.getElementById('west-team1').querySelector('span').textContent = westTeam1;
+            document.getElementById('west-team1').querySelector('img').src = `/images/${teamImages[westTeam1] || 'placeholder.png'}`;
+            document.getElementById('west-team1').querySelector('img').alt = westTeam1;
+            document.getElementById('west-team2').querySelector('span').textContent = westTeam2;
+            document.getElementById('west-team2').querySelector('img').src = `/images/${teamImages[westTeam2] || 'placeholder.png'}`;
+            document.getElementById('west-team2').querySelector('img').alt = westTeam2;
+            // Define matchups for dropdowns
+            const matchups = {
+                eastWinner: [eastTeam1, eastTeam2],
+                westWinner: [westTeam1, westTeam2]
+            };
+            console.log('Matchups defined:', matchups); // Debug log
+            // Populate dropdowns with only the two teams in each matchup
+            ['eastWinner', 'westWinner'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
+                    const teams = matchups[id].filter(team => team && team !== 'Winner East 1' && team !== 'Winner East 2' && team !== 'Winner West 1' && team !== 'Winner West 2');
+                    console.log(`Populating ${id} with teams:`, teams); // Debug log
+                    if (teams.length === 2) {
+                        teams.forEach(team => {
+                            const option = document.createElement('option');
+                            option.value = team;
+                            option.textContent = team;
+                            select.appendChild(option);
+                        });
+                    } else {
+                        console.warn(`Invalid team count for ${id}:`, teams);
+                    }
+                    select.value = data.conferenceFinals[id] || '';
+                }
+            });
         })
         .catch(error => {
-            console.error('Error fetching Play-In data:', error);
-            alert('Please complete the Play-In step first.');
-            window.location.href = '/playin.html';
+            console.error('Fetch error for /get-conferencefinals:', error);
+            alert('Failed to load Conference Finals data. Please ensure you’re registered or contact support.');
+            window.location.href = '/';
         });
+
+    const conferenceFinalsForm = document.getElementById('conferencefinals-form');
+    if (!conferenceFinalsForm) {
+        console.error('Conference Finals form not found. Check if id="conferencefinals-form" exists.');
+        alert('Form error. Refresh or contact support.');
+        return;
+    }
+    conferenceFinalsForm.addEventListener('submit', submitConferenceFinals);
 });
 
-function fetchSemifinalsData() {
-    fetch('/get-semifinals', {
-        method: 'GET',
-        credentials: 'include',
-        mode: 'cors'
-    })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Semifinals data:', data);
-            if (!data['east-match1-winner'] || !data['east-match2-winner'] || !data['west-match1-winner'] || !data['west-match2-winner']) {
-                alert('Please complete the Semifinals step first.');
-                window.location.href = '/semifinals.html';
-                return;
-            }
-            populateMatchups(data);
-        })
-        .catch(error => {
-            console.error('Error fetching Semifinals data:', error);
-            alert('Please complete the Semifinals step first.');
-            window.location.href = '/semifinals.html';
-        });
-}
-
-function populateMatchups(semifinalsData) {
-    const teamLogos = {
-        'Bucks': '/images/bucks.png',
-        'Heat': '/images/heat.png',
-        'Celtics': '/images/celtics.png',
-        'Pacers': '/images/pacers.png',
-        'Knicks': '/images/knicks.png',
-        'Sixers': '/images/sixers.png',
-        'Hawks': '/images/hawks.png',
-        'Bulls': '/images/bulls.png',
-        'Hornets': '/images/hornets.png',
-        'Wizards': '/images/wizards.png',
-        'Nets': '/images/nets.png',
-        'Raptors': '/images/raptors.png',
-        'Nuggets': '/images/nuggets.png',
-        'Suns': '/images/suns.png',
-        'Warriors': '/images/warriors.png',
-        'Mavericks': '/images/mavericks.png',
-        'Lakers': '/images/lakers.png',
-        'Clippers': '/images/clippers.png',
-        'Pelicans': '/images/pelicans.png',
-        'Jazz': '/images/jazz.png',
-        'Kings': '/images/kings.png',
-        'Spurs': '/images/spurs.png',
-        'Pistons': '/images/pistons.png',
-        'Magic': '/images/magic.png',
-        'Rockets': '/images/rockets.png',
-        'Trail Blazers': '/images/trailblazers.png'
+function submitConferenceFinals(event) {
+    event.preventDefault();
+    const formData = {
+        eastWinner: document.getElementById('eastWinner')?.value || '',
+        westWinner: document.getElementById('westWinner')?.value || ''
     };
 
-    const matchups = [
-        { id: 'east-final-winner', teams: [semifinalsData['east-match1-winner'], semifinalsData['east-match2-winner']], logos: ['east-final-team1-logo', 'east-final-team2-logo'] },
-        { id: 'west-final-winner', teams: [semifinalsData['west-match1-winner'], semifinalsData['west-match2-winner']], logos: ['west-final-team1-logo', 'west-final-team2-logo'] }
-    ];
-
-    matchups.forEach(matchup => {
-        document.getElementById(matchup.logos[0]).src = teamLogos[matchup.teams[0]] || '/images/default.png';
-        document.getElementById(matchup.logos[0]).alt = `${matchup.teams[0]} Logo`;
-        document.getElementById(matchup.logos[1]).src = teamLogos[matchup.teams[1]] || '/images/default.png';
-        document.getElementById(matchup.logos[1]).alt = `${matchup.teams[1]} Logo`;
-
-        const select = document.getElementById(matchup.id);
-        if (select) {
-            select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
-            matchup.teams.forEach(team => {
-                const option = document.createElement('option');
-                option.value = team;
-                option.textContent = team;
-                select.appendChild(option);
-            });
-        } else {
-            console.error(`Select element with id '${matchup.id}' not found`);
-        }
-    });
-}
-
-function submitConferenceFinals() {
-    const winners = {};
-    document.querySelectorAll('.winner-select').forEach(select => {
-        if (select.value) {
-            winners[select.id] = select.value;
-        }
-    });
-
-    console.log('Selected winners:', winners);
-    if (Object.keys(winners).length !== document.querySelectorAll('.winner-select').length) {
-        alert('Please select a winner for all matchups.');
+    if (!formData.eastWinner || !formData.westWinner) {
+        alert('Please select all winners.');
         return;
     }
 
+    console.log('Submitting Conference Finals data:', formData);
     fetch('/submit-conferencefinals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conferenceFinals: winners }),
+        body: JSON.stringify({ conferenceFinals: formData }),
         credentials: 'include',
         mode: 'cors'
     })
@@ -136,12 +124,12 @@ function submitConferenceFinals() {
             console.log('Submit response:', data);
             if (data.error) alert(`Error: ${data.error}`);
             else {
-                alert('Conference Finals submitted successfully!');
+                alert('Conference Finals data saved successfully!');
                 window.location.href = '/finals.html';
             }
         })
         .catch(error => {
-            console.error('Error submitting Conference Finals data:', error);
-            alert('An error occurred. Please try again.');
+            console.error('Submit error for /submit-conferencefinals:', error);
+            alert('Failed to save Conference Finals data. Please try again or contact support.');
         });
 }
