@@ -4,49 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pool NBA 2025 - Play-In</title>
-    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/style.css">
 </head>
 <body>
-    <div class="header">
-        <img src="/images/nba-pool-logo.png" alt="Pool NBA Logo" class="logo">
-        <h1>BIENVENIDOS AL <span>POOL NBA</span> 2025</h1>
-    </div>
-
     <div class="container">
+        <img src="/images/nba-pool-logo.png" alt="NBA Pool Logo" class="logo" loading="lazy">
+        <h1>BIENVENIDOS AL POOL NBA 2025</h1>
         <h2>Step 2 of 7</h2>
-        <h3>PLAY-IN TOURNAMENT SELECTION</h3>
+        <h2>PLAY-IN TOURNAMENT SELECTION</h2>
         <form id="playin-form">
-            <h4>EASTERN CONFERENCE PLAY-IN:</h4>
-            <div class="form-group">
+            <h3>Eastern Conference Play-In</h3>
+            <div class="matchup">
                 <label for="east7">Select No. 7 Seed:</label>
-                <select id="east7" name="east7" required>
+                <select name="east7" id="east7">
                     <option value="" disabled selected>Select No. 7 Seed</option>
                 </select>
+            </div>
+            <div class="matchup">
                 <label for="east8">Select No. 8 Seed:</label>
-                <select id="east8" name="east8" required>
+                <select name="east8" id="east8">
                     <option value="" disabled selected>Select No. 8 Seed</option>
                 </select>
             </div>
-
-            <h4>WESTERN CONFERENCE PLAY-IN:</h4>
-            <div class="form-group">
+            <h3>Western Conference Play-In</h3>
+            <div class="matchup">
                 <label for="west7">Select No. 7 Seed:</label>
-                <select id="west7" name="west7" required>
+                <select name="west7" id="west7">
                     <option value="" disabled selected>Select No. 7 Seed</option>
                 </select>
+            </div>
+            <div class="matchup">
                 <label for="west8">Select No. 8 Seed:</label>
-                <select id="west8" name="west8" required>
+                <select name="west8" id="west8">
                     <option value="" disabled selected>Select No. 8 Seed</option>
                 </select>
             </div>
-
-            <div class="button-group">
-                <button type="button" onclick="window.location.href='/';">Previous</button>
-                <button type="submit">Next</button>
-            </div>
+            <button type="button" onclick="window.location.href='/'">Previous</button>
+            <button type="submit">Next</button>
         </form>
     </div>
-
     <script src="/scripts/playin.js" defer></script>
 </body>
 </html>

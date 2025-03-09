@@ -1,5 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Play-In page loaded with Super Grok optimization');
+    
+    // Define Play-In teams
+    const eastPlayinTeams = ['Atlanta', 'Miami', 'Orlando', 'Washington'];
+    const westPlayinTeams = ['New Orleans', 'San Antonio', 'Houston', 'Utah'];
+
+    // Populate dropdowns with teams
+    const east7Select = document.getElementById('east7');
+    const east8Select = document.getElementById('east8');
+    const west7Select = document.getElementById('west7');
+    const west8Select = document.getElementById('west8');
+
+    if (!east7Select || !east8Select || !west7Select || !west8Select) {
+        console.error('One or more Play-In dropdowns not found. Check if ids exist.');
+        alert('Form error. Refresh or contact support.');
+        return;
+    }
+
+    // Populate Eastern Conference dropdowns
+    eastPlayinTeams.forEach(team => {
+        const option7 = document.createElement('option');
+        option7.value = team;
+        option7.textContent = team;
+        east7Select.appendChild(option7);
+
+        const option8 = document.createElement('option');
+        option8.value = team;
+        option8.textContent = team;
+        east8Select.appendChild(option8);
+    });
+
+    // Populate Western Conference dropdowns
+    westPlayinTeams.forEach(team => {
+        const option7 = document.createElement('option');
+        option7.value = team;
+        option7.textContent = team;
+        west7Select.appendChild(option7);
+
+        const option8 = document.createElement('option');
+        option8.value = team;
+        option8.textContent = team;
+        west8Select.appendChild(option8);
+    });
+
+    // Fetch existing selections from the server
     fetch('/get-playin', {
         method: 'GET',
         credentials: 'include',
@@ -17,11 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/';
                 return;
             }
-            // Populate dropdowns with existing data
-            document.getElementById('east7').value = data.playin.east7 || '';
-            document.getElementById('east8').value = data.playin.east8 || '';
-            document.getElementById('west7').value = data.playin.west7 || '';
-            document.getElementById('west8').value = data.playin.west8 || '';
+            // Set existing selections
+            east7Select.value = data.playin.east7 || '';
+            east8Select.value = data.playin.east8 || '';
+            west7Select.value = data.playin.west7 || '';
+            west8Select.value = data.playin.west8 || '';
         })
         .catch(error => {
             console.error('Fetch error for /get-playin:', error);
@@ -47,8 +91,19 @@ function submitPlayin(event) {
         west8: document.getElementById('west8')?.value || ''
     };
 
+    // Validate selections
     if (!formData.east7 || !formData.east8 || !formData.west7 || !formData.west8) {
         alert('Please select all Play-In winners.');
+        return;
+    }
+
+    // Ensure 7th and 8th seeds are different for each conference
+    if (formData.east7 === formData.east8) {
+        alert('Eastern Conference 7th and 8th seeds must be different teams.');
+        return;
+    }
+    if (formData.west7 === formData.west8) {
+        alert('Western Conference 7th and 8th seeds must be different teams.');
         return;
     }
 
