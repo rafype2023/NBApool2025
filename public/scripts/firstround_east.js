@@ -17,29 +17,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/';
                 return;
             }
-            // Safely populate dropdowns with existence check
-            const matchups = ['matchup1', 'matchup2', 'matchup3', 'matchup4'];
-            let allElementsFound = true;
-            matchups.forEach(id => {
-                const select = document.getElementById(id);
-                if (select) {
-                    select.value = data[id] || '';
-                } else {
-                    console.error(`Select element with id '${id}' not found`);
-                    allElementsFound = false;
-                }
-            });
+            // Define matchups based on NBA seeding and Play-In results
+            const matchups = {
+                matchup1: ['Bucks', data.playin.east8], // 1st vs 8th
+                matchup2: ['Hawks', data.playin.east7], // 2nd vs 7th
+                matchup3: ['Celtics', '6th Seed'],      // 3rd vs 6th
+                matchup4: ['Knicks', 'Sixers']          // 4th vs 5th
+            };
+            // Safely populate dropdowns with matchup-specific options
+            const allElementsFound = populateDropdowns(matchups);
             if (!allElementsFound) {
                 alert('Form error. Some elements are missing. Refresh or contact support.');
                 return;
             }
-            populateDropdowns();
+            // Set previously saved values
+            ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.value = data.firstRoundEast[id] || '';
+                }
+            });
         })
         .catch(error => {
             console.error('Fetch error for /get-firstround-east:', error);
             alert('Failed to load First Round East data. Please ensure you’re registered or contact support.');
             window.location.href = '/';
-            populateDropdowns();
         });
 
     const firstRoundEastForm = document.getElementById('firstround-east-form');
@@ -51,12 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
     firstRoundEastForm.addEventListener('submit', submitFirstRoundEast);
 });
 
-function populateDropdowns() {
-    const teams = ['Bucks', 'Hawks', 'Celtics', 'Knicks', '7th Seed', '8th Seed', '6th Seed', 'Sixers'];
+function populateDropdowns(matchups) {
+    let allElementsFound = true;
     ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
         const select = document.getElementById(id);
-        if (select) {
-            select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
+        if (!select) {
+            console.error(`Select element with id '${id}' not found`);
+            allElementsFound = false;
+            return;
+        }
+        select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
+        const teams = matchups[id];
+        if (teams) {
             teams.forEach(team => {
                 const option = document.createElement('option');
                 option.value = team;
@@ -64,9 +72,11 @@ function populateDropdowns() {
                 select.appendChild(option);
             });
         } else {
-            console.error(`Select element with id '${id}' not found during population`);
+            console.error(`No teams defined for matchup '${id}'`);
+            allElementsFound = false;
         }
     });
+    return allElementsFound;
 }
 
 function submitFirstRoundEast(event) {
