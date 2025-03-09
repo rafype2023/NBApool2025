@@ -1,10 +1,36 @@
-
-});
-const User = mongoose.model('User', userSchema);
 const express = require('express');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const path = require('path');
+const MongoStore = require('connect-mongo');
+
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Session middleware
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nba_pool' }),
+    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+}));
+
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nba_pool', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch(err => {
+    console.error('MongoDB connection error:', err);
+});
+
+// User Schema
 const userSchema = new mongoose.Schema({
     name: String,
     email: { type: String, unique: true },
@@ -56,142 +82,79 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
-module.exports = User; // Ensure this is exported if used elsewhere
-const cors = require('cors');
-const path = require('path');
-
-const app = express();
-
-// MongoDB Connection
-const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/nbapool';
-mongoose.connect(mongoUrl, { useUnifiedTopology: true })
-    .then(() => console.log('MongoDB connected successfully'))
-    .catch(err => console.error('MongoDB connection error:', err));
-
-// Trust Proxy for Render
-app.set('trust proxy', 1);
-
-// CORS Configuration
-app.use(cors({
-    origin: 'https://nbapool2025.onrender.com',
-    credentials: true,
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    exposedHeaders: ['Set-Cookie'],
-    preflightContinue: false,
-    optionsSuccessStatus: 204
-}));
-
-// Session Configuration
-app.use(session({
-    name: 'connect.sid',
-    secret: process.env.SESSION_SECRET || 'your-secure-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: mongoUrl,
-        ttl: 24 * 60 * 60,
-        autoRemove: 'native',
-        autoRemoveInterval: 10
-    }, (err) => {
-        if (err) console.error('MongoStore error:', err);
-        else console.log('MongoStore initialized');
-    }),
-    cookie: {
-        secure: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: 'none',
-        path: '/',
-        domain: 'nbapool2025.onrender.com'
-    },
-    proxy: true
-}));
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public'), {
-    maxAge: '1d' // Cache static files for 1 day
-}));
-
-// Debug Headers
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - SessionID: ${req.sessionID}, UserId: ${req.session.userId}, Cookie: ${req.headers.cookie || 'none'}`);
-    console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
-    console.log('Response Headers:', JSON.stringify(res.getHeaders(), null, 2));
-    next();
-});
-
-// Security Headers
-app.use((req, res, next) => {
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    next();
-});
-
-// User Schema
-const userSchema = new mongoose.Schema({
-    name: String,
-    email: { type: String, unique: true },
-    phone: String,
-    comments: String,
-    paymentMethod: String,
-    playin: Object,
-    firstRoundEast: Object,
-    firstRoundWest: Object,
-    semifinals: Object,
-    conferenceFinals: Object,
-    finals: Object
-});
-const User = mongoose.model('User', userSchema);
 
 // Routes
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
-app.get('/playin.html', (req, res) => res.sendFile(path.join(__dirname, 'views', 'playin.html')));
-app.get('/firstround_east.html', (req, res) => res.sendFile(path.join(__dirname, 'views', 'firstround_east.html')));
-app.get('/firstround_west.html', (req, res) => res.sendFile(path.join(__dirname, 'views', 'firstround_west.html')));
-app.get('/semifinals.html', (req, res) => res.sendFile(path.join(__dirname, 'views', 'semifinals.html')));
-app.get('/conferencefinals.html', (req, res) => res.sendFile(path.join(__dirname, 'views', 'conferencefinals.html')));
-app.get('/finals.html', (req, res) => res.sendFile(path.join(__dirname, 'views', 'finals.html')));
-app.get('/summary.html', (req, res) => res.sendFile(path.join(__dirname, 'views', 'summary.html')));
 
-app.post('/submit-registration', async (req, res) => {
-    console.log('Registration attempt:', req.body);
-    if (!req.body.name || !req.body.email || !req.body.phone || !req.body.paymentMethod) {
-        return res.status(400).json({ error: 'All fields except comments are required' });
-    }
+// Serve HTML pages
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
+app.get('/playin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'playin.html'));
+});
+
+app.get('/firstround_east.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'firstround_east.html'));
+});
+
+app.get('/firstround_west.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'firstround_west.html'));
+});
+
+app.get('/semifinals.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'semifinals.html'));
+});
+
+app.get('/conferencefinals.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'conferencefinals.html'));
+});
+
+app.get('/finals.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'finals.html'));
+});
+
+app.get('/summary.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'summary.html'));
+});
+
+// Registration Route
+app.post('/register', async (req, res) => {
+    console.log('Register request:', req.body);
     try {
-        const existingUser = await User.findOne({ email: req.body.email });
-        if (existingUser) return res.status(400).json({ error: 'Email already registered' });
-
-        const user = new User(req.body);
+        const { name, email, phone, comments, paymentMethod } = req.body;
+        const user = new User({ name, email, phone, comments, paymentMethod });
         await user.save();
-        req.session.userId = user._id.toString();
-        req.session.save(err => {
-            if (err) {
-                console.error('Session save error:', err);
-                return res.status(500).json({ error: 'Failed to save session' });
-            }
-            console.log('Session saved successfully with UserId:', req.session.userId);
-            res.set('Set-Cookie', `connect.sid=${req.sessionID}; HttpOnly; Secure; SameSite=None; Domain=nbapool2025.onrender.com; Path=/; Max-Age=86400`);
-            res.json({ message: 'Registration successful' });
-        });
+        req.session.userId = user._id;
+        console.log('User registered:', user);
+        res.json({ message: 'Registration successful', redirect: '/playin.html' });
     } catch (error) {
-        console.error('Registration error:', error);
-        res.status(500).json({ error: 'Server error during registration' });
+        console.error('Error registering user:', error);
+        if (error.code === 11000) {
+            res.status(400).json({ error: 'Email already exists' });
+        } else {
+            res.status(500).json({ error: 'Server error during registration' });
+        }
     }
 });
 
+// Play-In Routes
 app.get('/get-playin', async (req, res) => {
     console.log('Get Play-In request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    console.log('Session Cookie from Request:', req.headers.cookie || 'none');
     if (!req.session.userId) {
         console.warn('Unauthorized access to /get-playin - Session not found');
         return res.status(401).json({ error: 'Unauthorized: Please register first' });
     }
     try {
         const user = await User.findById(req.session.userId);
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json(user.playin || { east7: '', east8: '', west7: '', west8: '' });
+        if (!user) {
+            console.warn('User not found for ID:', req.session.userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const responseData = { playin: user.playin || {} };
+        console.log('Returning Play-In data:', responseData);
+        res.json(responseData);
     } catch (error) {
         console.error('Error fetching Play-In data:', error);
         res.status(500).json({ error: 'Server error fetching Play-In data' });
@@ -206,10 +169,11 @@ app.post('/submit-playin', async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(
             req.session.userId,
-            { playin: req.body },
+            { playin: req.body.playin },
             { new: true, runValidators: true }
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
+        console.log('Updated Play-In data for user:', user.playin);
         res.json({ message: 'Play-In data saved successfully' });
     } catch (error) {
         console.error('Error saving Play-In data:', error);
@@ -217,7 +181,7 @@ app.post('/submit-playin', async (req, res) => {
     }
 });
 
-// Update existing routes
+// First Round East Routes
 app.get('/get-firstround-east', async (req, res) => {
     console.log('Get First Round East request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
     console.log('Session Cookie from Request:', req.headers.cookie || 'none');
@@ -262,6 +226,7 @@ app.post('/submit-firstround-east', async (req, res) => {
     }
 });
 
+// First Round West Routes
 app.get('/get-firstround-west', async (req, res) => {
     console.log('Get First Round West request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
     console.log('Session Cookie from Request:', req.headers.cookie || 'none');
@@ -306,6 +271,7 @@ app.post('/submit-firstround-west', async (req, res) => {
     }
 });
 
+// Semifinals Routes
 app.get('/get-semifinals', async (req, res) => {
     console.log('Get Semifinals request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
     console.log('Session Cookie from Request:', req.headers.cookie || 'none');
@@ -361,6 +327,7 @@ app.post('/submit-semifinals', async (req, res) => {
     }
 });
 
+// Conference Finals Routes
 app.get('/get-conferencefinals', async (req, res) => {
     console.log('Get Conference Finals request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
     console.log('Session Cookie from Request:', req.headers.cookie || 'none');
@@ -416,6 +383,7 @@ app.post('/submit-conferencefinals', async (req, res) => {
     }
 });
 
+// Finals Routes
 app.get('/get-finals', async (req, res) => {
     console.log('Get Finals request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
     console.log('Session Cookie from Request:', req.headers.cookie || 'none');
@@ -470,38 +438,8 @@ app.post('/submit-finals', async (req, res) => {
     }
 });
 
-app.get('/get-all-picks', async (req, res) => {
-    console.log('Get All Picks request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
-    if (!req.session.userId) {
-        console.warn('Unauthorized access to /get-all-picks - Session not found');
-        return res.status(401).json({ error: 'Unauthorized: Please register first' });
-    }
-    try {
-        const user = await User.findById(req.session.userId);
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json({
-            playin: user.playin || {},
-            firstRoundEast: user.firstRoundEast || {},
-            firstRoundWest: user.firstRoundWest || {},
-            semifinals: user.semifinals || {},
-            conferenceFinals: user.conferenceFinals || {},
-            finals: user.finals || {}
-        });
-    } catch (error) {
-        console.error('Error fetching all picks:', error);
-        res.status(500).json({ error: 'Server error fetching all picks' });
-    }
-});
-
-app.get('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            console.error('Error destroying session:', err);
-            return res.status(500).json({ error: 'Error logging out' });
-        }
-        res.redirect('/');
-    });
-});
-
+// Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
