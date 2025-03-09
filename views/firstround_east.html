@@ -12,13 +12,16 @@
         <h1>BIENVENIDOS AL POOL NBA 2025</h1>
         <h2>FIRST ROUND - EASTERN CONFERENCE</h2>
         <form id="firstround-east-form">
-            <div class="matchup">
-                <img src="/images/cavaliers.png" alt="Cleveland Cavaliers" loading="lazy"> vs. 
-                <span class="opponent">
-                    <img id="matchup1-opponent-img" src="/images/placeholder.png" alt="8th Seed" loading="lazy">
-                    <span id="matchup1-opponent">8th Seed</span>
+            <div class="matchup" id="matchup1">
+                <span id="matchup1-team1" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 1" loading="lazy">
+                    <span>1st Seed</span>
+                </span> vs. 
+                <span id="matchup1-team2" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 2" loading="lazy">
+                    <span>8th Seed</span>
                 </span>
-                <select name="matchup1" id="matchup1">
+                <select name="matchup1" id="matchup1-select">
                     <option value="" disabled selected>Select WINNER</option>
                 </select>
                 <select name="series1" id="series1">
@@ -29,13 +32,16 @@
                     <option value="4-3">4-3</option>
                 </select>
             </div>
-            <div class="matchup">
-                <img src="/images/celtics.png" alt="Boston Celtics" loading="lazy"> vs. 
-                <span class="opponent">
-                    <img id="matchup2-opponent-img" src="/images/placeholder.png" alt="7th Seed" loading="lazy">
-                    <span id="matchup2-opponent">7th Seed</span>
+            <div class="matchup" id="matchup2">
+                <span id="matchup2-team1" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 1" loading="lazy">
+                    <span>2nd Seed</span>
+                </span> vs. 
+                <span id="matchup2-team2" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 2" loading="lazy">
+                    <span>7th Seed</span>
                 </span>
-                <select name="matchup2" id="matchup2">
+                <select name="matchup2" id="matchup2-select">
                     <option value="" disabled selected>Select WINNER</option>
                 </select>
                 <select name="series2" id="series2">
@@ -46,13 +52,16 @@
                     <option value="4-3">4-3</option>
                 </select>
             </div>
-            <div class="matchup">
-                <img src="/images/knicks.png" alt="New York Knicks" loading="lazy"> vs. 
-                <span class="opponent">
-                    <img id="matchup3-opponent-img" src="/images/pistons.png" alt="Detroit Pistons" loading="lazy">
-                    <span id="matchup3-opponent">Detroit</span>
+            <div class="matchup" id="matchup3">
+                <span id="matchup3-team1" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 1" loading="lazy">
+                    <span>3rd Seed</span>
+                </span> vs. 
+                <span id="matchup3-team2" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 2" loading="lazy">
+                    <span>6th Seed</span>
                 </span>
-                <select name="matchup3" id="matchup3">
+                <select name="matchup3" id="matchup3-select">
                     <option value="" disabled selected>Select WINNER</option>
                 </select>
                 <select name="series3" id="series3">
@@ -63,13 +72,16 @@
                     <option value="4-3">4-3</option>
                 </select>
             </div>
-            <div class="matchup">
-                <img src="/images/bucks.png" alt="Milwaukee Bucks" loading="lazy"> vs. 
-                <span class="opponent">
-                    <img id="matchup4-opponent-img" src="/images/pacers.png" alt="Indiana Pacers" loading="lazy">
-                    <span id="matchup4-opponent">Indiana</span>
+            <div class="matchup" id="matchup4">
+                <span id="matchup4-team1" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 1" loading="lazy">
+                    <span>4th Seed</span>
+                </span> vs. 
+                <span id="matchup4-team2" class="team-with-logo">
+                    <img src="/images/placeholder.png" alt="Team 2" loading="lazy">
+                    <span>5th Seed</span>
                 </span>
-                <select name="matchup4" id="matchup4">
+                <select name="matchup4" id="matchup4-select">
                     <option value="" disabled selected>Select WINNER</option>
                 </select>
                 <select name="series4" id="series4">
@@ -84,5 +96,6 @@
             <button type="submit">Next</button>
         </form>
     </div>
-    <script src="/scripts/firstround_east.js"></script>
+    <script src="/scripts/firstround_east.js" defer></script>
+</body>
 </html>
