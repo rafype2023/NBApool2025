@@ -17,12 +17,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/';
                 return;
             }
-            // Update opponent labels with Play-In results
+            // Map team names to image file names (nicknames)
+            const teamImages = {
+                'Cleveland': 'cavaliers.png',
+                'Boston': 'celtics.png',
+                'New York Knicks': 'knicks.png',
+                'Milwaukee': 'bucks.png',
+                'Magic': 'magic.png',
+                'Pistons': 'pistons.png',
+                'Detroit': 'pistons.png', // Same as Pistons
+                'Indiana': 'pacers.png'
+            };
+            // Update opponent labels and images with Play-In results
             document.getElementById('matchup1-opponent').textContent = data.playin.east8;
+            document.getElementById('matchup1-opponent-img').src = `/images/${teamImages[data.playin.east8] || 'placeholder.png'}`;
+            document.getElementById('matchup1-opponent-img').alt = data.playin.east8;
             document.getElementById('matchup2-opponent').textContent = data.playin.east7;
-            document.getElementById('matchup3-opponent').textContent = 'Detroit'; // 6th Seed
-            document.getElementById('matchup4-opponent').textContent = 'Indiana'; // 5th Seed
-            // Define matchups based on new Eastern Conference order
+            document.getElementById('matchup2-opponent-img').src = `/images/${teamImages[data.playin.east7] || 'placeholder.png'}`;
+            document.getElementById('matchup2-opponent-img').alt = data.playin.east7;
+            document.getElementById('matchup3-opponent').textContent = 'Detroit';
+            document.getElementById('matchup3-opponent-img').src = '/images/pistons.png';
+            document.getElementById('matchup3-opponent-img').alt = 'Detroit Pistons';
+            document.getElementById('matchup4-opponent').textContent = 'Indiana';
+            document.getElementById('matchup4-opponent-img').src = '/images/pacers.png';
+            document.getElementById('matchup4-opponent-img').alt = 'Indiana Pacers';
+            // Define matchups based on Eastern Conference order
             const matchups = {
                 matchup1: ['Cleveland', data.playin.east8], // 1st vs 8th
                 matchup2: ['Boston', data.playin.east7],    // 2nd vs 7th
