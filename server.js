@@ -44,14 +44,14 @@ app.use(session({
         else console.log('MongoStore initialized');
     }),
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: true, // Explicitly set for HTTPS
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: 'none', // Explicitly set for production
+        sameSite: 'none', // Required for cross-origin on Render
         path: '/',
-        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
+        domain: '.onrender.com' // Explicit domain for Render
     },
-    proxy: true // Explicit proxy support
+    proxy: true
 }));
 
 // Middleware
@@ -106,10 +106,13 @@ app.post('/submit-registration', async (req, res) => {
         await user.save();
         req.session.userId = user._id.toString();
         req.session.save(err => {
-            if (err) console.error('Session save error:', err);
-            else console.log('Session saved with UserId:', req.session.userId);
+            if (err) {
+                console.error('Session save error:', err);
+                return res.status(500).json({ error: 'Failed to save session' });
+            }
+            console.log('Session saved successfully with UserId:', req.session.userId);
+            res.json({ message: 'Registration successful' });
         });
-        res.json({ message: 'Registration successful' });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ error: 'Server error during registration' });
