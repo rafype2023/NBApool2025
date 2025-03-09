@@ -1,4 +1,10 @@
-// At the top, update the userSchema
+
+});
+const User = mongoose.model('User', userSchema);
+const express = require('express');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     name: String,
     email: { type: String, unique: true },
@@ -44,15 +50,13 @@ const userSchema = new mongoose.Schema({
     },
     finals: {
         champion: String,
-	mvp: String,
+        mvp: String,
         finalScore: String // e.g., "120-115"
     }
 });
+
 const User = mongoose.model('User', userSchema);
-const express = require('express');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const mongoose = require('mongoose');
+module.exports = User; // Ensure this is exported if used elsewhere
 const cors = require('cors');
 const path = require('path');
 
