@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update opponent labels with Play-In results
             document.getElementById('matchup1-opponent').textContent = data.playin.east8;
             document.getElementById('matchup2-opponent').textContent = data.playin.east7;
-            document.getElementById('matchup3-opponent').textContent = '6th Seed';
-            document.getElementById('matchup4-opponent').textContent = 'Sixers';
-            // Define matchups
+            document.getElementById('matchup3-opponent').textContent = 'Detroit'; // 6th Seed
+            document.getElementById('matchup4-opponent').textContent = 'Indiana'; // 5th Seed
+            // Define matchups based on new Eastern Conference order
             const matchups = {
-                matchup1: ['Bucks', data.playin.east8], // 1st vs 8th
-                matchup2: ['Hawks', data.playin.east7], // 2nd vs 7th
-                matchup3: ['Celtics', '6th Seed'],      // 3rd vs 6th
-                matchup4: ['Knicks', 'Sixers']          // 4th vs 5th
+                matchup1: ['Cleveland', data.playin.east8], // 1st vs 8th
+                matchup2: ['Boston', data.playin.east7],    // 2nd vs 7th
+                matchup3: ['New York Knicks', 'Detroit'],   // 3rd vs 6th
+                matchup4: ['Milwaukee', 'Indiana']          // 4th vs 5th
             };
             // Populate dropdowns
             const allElementsFound = populateDropdowns(matchups);
