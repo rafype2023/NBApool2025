@@ -17,19 +17,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/playin.html';
                 return;
             }
-            const teamImages = {
+             const teamImages = {
+                'Cleveland': 'cavaliers.png',
+                'Boston': 'celtics.png',
+                'New York Knicks': 'knicks.png',
+                'Milwaukee': 'bucks.png',
+                'Magic': 'magic.png',
+                'Pistons': 'pistons.png',
+                'Detroit': 'pistons.png',
+                'Indiana': 'pacers.png',
                 'OKC': 'thunder.png',
                 'Denver': 'nuggets.png',
                 'Los Angeles': 'lakers.png',
                 'Memphis': 'grizzlies.png',
                 'Houston': 'rockets.png',
                 'Golden State': 'warriors.png',
-                'Suns': 'suns.png',
-                'Pelicans': 'pelicans.png',
-                'Kings': 'kings.png',
-                'Spurs': 'spurs.png',
-                'Timberwolves': 'timberwolves.png'
-            };
+    'Atlanta': 'hawks.png',
+    'Miami': 'heat.png',
+    'Orlando': 'magic.png',
+    'Washington': 'wizards.png',
+    'Detroit': 'pistons.png',
+    'Indiana': 'pacers.png',
+    'New Orleans': 'pelicans.png',
+    'San Antonio': 'spurs.png',
+    'Houston': 'rockets.png',
+    'Utah': 'jazz.png'
+    // Add more teams as needed
+};
             document.getElementById('matchup1-opponent').textContent = data.playin.west8;
             document.getElementById('matchup1-opponent-img').src = `/images/${teamImages[data.playin.west8] || 'placeholder.png'}`;
             document.getElementById('matchup1-opponent-img').alt = data.playin.west8;

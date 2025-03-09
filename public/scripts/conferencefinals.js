@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = data.error.includes('Semifinals') ? '/semifinals.html' : '/';
                 return;
             }
+                        // Map team names to image file names (nicknames)
             const teamImages = {
                 'Cleveland': 'cavaliers.png',
                 'Boston': 'celtics.png',
@@ -31,8 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Los Angeles': 'lakers.png',
                 'Memphis': 'grizzlies.png',
                 'Houston': 'rockets.png',
-                'Golden State': 'warriors.png'
-            };
+                'Golden State': 'warriors.png',
+    'Atlanta': 'hawks.png',
+    'Miami': 'heat.png',
+    'Orlando': 'magic.png',
+    'Washington': 'wizards.png',
+    'Detroit': 'pistons.png',
+    'Indiana': 'pacers.png',
+    'New Orleans': 'pelicans.png',
+    'San Antonio': 'spurs.png',
+    'Houston': 'rockets.png',
+    'Utah': 'jazz.png'
+    // Add more teams as needed
+};
             const eastTeam1 = data.semifinals.east1 || 'Winner East 1';
             const eastTeam2 = data.semifinals.east2 || 'Winner East 2';
             document.getElementById('east-team1').querySelector('span').textContent = eastTeam1;

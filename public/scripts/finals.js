@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             // Map team names to image file names (nicknames)
-            const teamImages = {
+                 const teamImages = {
                 'Cleveland': 'cavaliers.png',
                 'Boston': 'celtics.png',
                 'New York Knicks': 'knicks.png',
@@ -32,8 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Los Angeles': 'lakers.png',
                 'Memphis': 'grizzlies.png',
                 'Houston': 'rockets.png',
-                'Golden State': 'warriors.png'
-            };
+                'Golden State': 'warriors.png',
+    'Atlanta': 'hawks.png',
+    'Miami': 'heat.png',
+    'Orlando': 'magic.png',
+    'Washington': 'wizards.png',
+    'Detroit': 'pistons.png',
+    'Indiana': 'pacers.png',
+    'New Orleans': 'pelicans.png',
+    'San Antonio': 'spurs.png',
+    'Houston': 'rockets.png',
+    'Utah': 'jazz.png'
+    // Add more teams as needed
+};
             // Set NBA Finals
             const eastWinner = data.conferenceFinals.eastWinner || 'East Winner';
             const westWinner = data.conferenceFinals.westWinner || 'West Winner';

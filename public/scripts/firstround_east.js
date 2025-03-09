@@ -13,11 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             console.log('First Round East data received:', data);
             if (data.error) {
-                alert(`Error: ${data.error}. Redirecting to registration.`);
-                window.location.href = '/';
+                alert(`${data.error}. Contact support if the issue persists.`);
+                window.location.href = data.error.includes('Play-In') ? '/playin.html' : '/';
                 return;
             }
-            const teamImages = {
+            // Map team names to image file names (nicknames)
+              const teamImages = {
                 'Cleveland': 'cavaliers.png',
                 'Boston': 'celtics.png',
                 'New York Knicks': 'knicks.png',
@@ -25,42 +26,113 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Magic': 'magic.png',
                 'Pistons': 'pistons.png',
                 'Detroit': 'pistons.png',
-                'Indiana': 'pacers.png'
-            };
-            document.getElementById('matchup1-opponent').textContent = data.playin.east8;
-            document.getElementById('matchup1-opponent-img').src = `/images/${teamImages[data.playin.east8] || 'placeholder.png'}`;
-            document.getElementById('matchup1-opponent-img').alt = data.playin.east8;
-            document.getElementById('matchup2-opponent').textContent = data.playin.east7;
-            document.getElementById('matchup2-opponent-img').src = `/images/${teamImages[data.playin.east7] || 'placeholder.png'}`;
-            document.getElementById('matchup2-opponent-img').alt = data.playin.east7;
-            document.getElementById('matchup3-opponent').textContent = 'Detroit';
-            document.getElementById('matchup3-opponent-img').src = '/images/pistons.png';
-            document.getElementById('matchup4-opponent').textContent = 'Indiana';
-            document.getElementById('matchup4-opponent-img').src = '/images/pacers.png';
+                'Indiana': 'pacers.png',
+                'OKC': 'thunder.png',
+                'Denver': 'nuggets.png',
+                'Los Angeles': 'lakers.png',
+                'Memphis': 'grizzlies.png',
+                'Houston': 'rockets.png',
+                'Golden State': 'warriors.png',
+    'Atlanta': 'hawks.png',
+    'Miami': 'heat.png',
+    'Orlando': 'magic.png',
+    'Washington': 'wizards.png',
+    'Detroit': 'pistons.png',
+    'Indiana': 'pacers.png',
+    'New Orleans': 'pelicans.png',
+    'San Antonio': 'spurs.png',
+    'Houston': 'rockets.png',
+    'Utah': 'jazz.png'
+    // Add more teams as needed
+};          // Use Play-In data for 7th and 8th seeds
+            const east7 = data.playin.east7 || '7th Seed';
+            const east8 = data.playin.east8 || '8th Seed';
+            // Define matchups based on Play-In winners
+            const matchup1Team1 = 'Cleveland'; // Fixed seed 1
+            const matchup1Team2 = east8; // 8th seed from Play-In
+            const matchup2Team1 = 'Boston'; // Fixed seed 2
+            const matchup2Team2 = east7; // 7th seed from Play-In
+            const matchup3Team1 = 'New York Knicks'; // Fixed seed 3
+            const matchup3Team2 = 'Detroit'; // Fixed seed 6
+            const matchup4Team1 = 'Milwaukee'; // Fixed seed 4
+            const matchup4Team2 = 'Indiana'; // Fixed seed 5
+            // Set team names and logos
+            document.getElementById('matchup1-team1').querySelector('span').textContent = matchup1Team1;
+            document.getElementById('matchup1-team1').querySelector('img').src = `/images/${teamImages[matchup1Team1] || 'placeholder.png'}`;
+            document.getElementById('matchup1-team1').querySelector('img').alt = matchup1Team1;
+            document.getElementById('matchup1-team2').querySelector('span').textContent = matchup1Team2;
+            document.getElementById('matchup1-team2').querySelector('img').src = `/images/${teamImages[matchup1Team2] || 'placeholder.png'}`;
+            document.getElementById('matchup1-team2').querySelector('img').alt = matchup1Team2;
+            document.getElementById('matchup2-team1').querySelector('span').textContent = matchup2Team1;
+            document.getElementById('matchup2-team1').querySelector('img').src = `/images/${teamImages[matchup2Team1] || 'placeholder.png'}`;
+            document.getElementById('matchup2-team1').querySelector('img').alt = matchup2Team1;
+            document.getElementById('matchup2-team2').querySelector('span').textContent = matchup2Team2;
+            document.getElementById('matchup2-team2').querySelector('img').src = `/images/${teamImages[matchup2Team2] || 'placeholder.png'}`;
+            document.getElementById('matchup2-team2').querySelector('img').alt = matchup2Team2;
+            document.getElementById('matchup3-team1').querySelector('span').textContent = matchup3Team1;
+            document.getElementById('matchup3-team1').querySelector('img').src = `/images/${teamImages[matchup3Team1] || 'placeholder.png'}`;
+            document.getElementById('matchup3-team1').querySelector('img').alt = matchup3Team1;
+            document.getElementById('matchup3-team2').querySelector('span').textContent = matchup3Team2;
+            document.getElementById('matchup3-team2').querySelector('img').src = `/images/${teamImages[matchup3Team2] || 'placeholder.png'}`;
+            document.getElementById('matchup3-team2').querySelector('img').alt = matchup3Team2;
+            document.getElementById('matchup4-team1').querySelector('span').textContent = matchup4Team1;
+            document.getElementById('matchup4-team1').querySelector('img').src = `/images/${teamImages[matchup4Team1] || 'placeholder.png'}`;
+            document.getElementById('matchup4-team1').querySelector('img').alt = matchup4Team1;
+            document.getElementById('matchup4-team2').querySelector('span').textContent = matchup4Team2;
+            document.getElementById('matchup4-team2').querySelector('img').src = `/images/${teamImages[matchup4Team2] || 'placeholder.png'}`;
+            document.getElementById('matchup4-team2').querySelector('img').alt = matchup4Team2;
+            // Define matchups for dropdowns
             const matchups = {
-                matchup1: ['Cleveland', data.playin.east8],
-                matchup2: ['Boston', data.playin.east7],
-                matchup3: ['New York Knicks', 'Detroit'],
-                matchup4: ['Milwaukee', 'Indiana']
+                matchup1: [matchup1Team1, matchup1Team2],
+                matchup2: [matchup2Team1, matchup2Team2],
+                matchup3: [matchup3Team1, matchup3Team2],
+                matchup4: [matchup4Team1, matchup4Team2]
             };
-            const allElementsFound = populateDropdowns(matchups);
-            if (!allElementsFound) {
-                alert('Form error. Some elements are missing. Refresh or contact support.');
-                return;
-            }
+            console.log('Matchups defined:', matchups); // Debug log
+            // Populate dropdowns with teams
             ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
                 const select = document.getElementById(id);
-                if (select) select.value = data.firstRoundEast[id] || '';
+                if (select) {
+                    select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
+                    const teams = matchups[id].filter(team => team && team !== '7th Seed' && team !== '8th Seed');
+                    console.log(`Populating ${id} with teams:`, teams); // Debug log
+                    if (teams.length === 2) {
+                        teams.forEach(team => {
+                            const option = document.createElement('option');
+                            option.value = team;
+                            option.textContent = team;
+                            select.appendChild(option);
+                        });
+                    } else {
+                        console.warn(`Invalid team count for ${id}:`, teams);
+                    }
+                    select.value = data.firstRoundEast[id] || '';
+                } else {
+                    console.error(`Select element with id '${id}' not found`);
+                }
             });
+            // Populate series length dropdowns
             ['series1', 'series2', 'series3', 'series4'].forEach(id => {
                 const select = document.getElementById(id);
-                if (select) select.value = data.firstRoundEast[id] || '';
+                if (select) {
+                    console.log(`Populating ${id} with series options`); // Debug log
+                    select.innerHTML = '<option value="" disabled selected>Select SERIES LENGTH</option>';
+                    ['4-0', '4-1', '4-2', '4-3'].forEach(series => {
+                        const option = document.createElement('option');
+                        option.value = series;
+                        option.textContent = series;
+                        select.appendChild(option);
+                    });
+                    select.value = data.firstRoundEast[id] || '';
+                } else {
+                    console.error(`Select element with id '${id}' not found`);
+                }
             });
         })
         .catch(error => {
             console.error('Fetch error for /get-firstround-east:', error);
-            alert('Failed to load First Round East data. Please ensure you’re registered or contact support.');
-            window.location.href = '/';
+            alert('Failed to load First Round East data. Please ensure you’ve completed the Play-In step or contact support.');
+            window.location.href = '/playin.html';
         });
 
     const firstRoundEastForm = document.getElementById('firstround-east-form');
@@ -71,32 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     firstRoundEastForm.addEventListener('submit', submitFirstRoundEast);
 });
-
-function populateDropdowns(matchups) {
-    let allElementsFound = true;
-    ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
-        const select = document.getElementById(id);
-        if (!select) {
-            console.error(`Select element with id '${id}' not found`);
-            allElementsFound = false;
-            return;
-        }
-        select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
-        const teams = matchups[id];
-        if (teams) {
-            teams.forEach(team => {
-                const option = document.createElement('option');
-                option.value = team;
-                option.textContent = team;
-                select.appendChild(option);
-            });
-        } else {
-            console.error(`No teams defined for matchup '${id}'`);
-            allElementsFound = false;
-        }
-    });
-    return allElementsFound;
-}
 
 function submitFirstRoundEast(event) {
     event.preventDefault();

@@ -32,7 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Los Angeles': 'lakers.png',
                 'Memphis': 'grizzlies.png',
                 'Houston': 'rockets.png',
-                'Golden State': 'warriors.png'
+                'Golden State': 'warriors.png',
+    'Atlanta': 'hawks.png',
+    'Miami': 'heat.png',
+    'Orlando': 'magic.png',
+    'Washington': 'wizards.png',
+    'Detroit': 'pistons.png',
+    'Indiana': 'pacers.png',
+    'New Orleans': 'pelicans.png',
+    'San Antonio': 'spurs.png',
+    'Houston': 'rockets.png',
+    'Utah': 'jazz.png'
+};
+    // Add more teams as needed
             };
             // Set Eastern Conference Semifinals
             const eastMatchup1Team1 = data.firstRoundEast.matchup1 || 'Winner 1 vs 8';
