@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Memphis': 'grizzlies.png',
                 'Houston': 'rockets.png',
                 'Golden State': 'warriors.png'
-                // Add more teams as needed based on Play-In possibilities
             };
             // Set NBA Finals
             const eastWinner = data.conferenceFinals.eastWinner || 'East Winner';
@@ -44,15 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('finals-team2').querySelector('span').textContent = westWinner;
             document.getElementById('finals-team2').querySelector('img').src = `/images/${teamImages[westWinner] || 'placeholder.png'}`;
             document.getElementById('finals-team2').querySelector('img').alt = westWinner;
-            // Define matchup for dropdown
+            // Define matchup for champion dropdown
             const matchup = {
                 champion: [eastWinner, westWinner]
             };
             console.log('Matchup defined:', matchup); // Debug log
-            // Populate dropdown with only the two teams in the matchup
-            const select = document.getElementById('champion');
-            if (select) {
-                select.innerHTML = '<option value="" disabled selected>Select CHAMPION</option>';
+            // Populate champion dropdown
+            const championSelect = document.getElementById('champion');
+            if (championSelect) {
+                championSelect.innerHTML = '<option value="" disabled selected>Select CHAMPION</option>';
                 const teams = matchup.champion.filter(team => team && team !== 'East Winner' && team !== 'West Winner');
                 console.log('Populating champion with teams:', teams); // Debug log
                 if (teams.length === 2) {
@@ -60,12 +59,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         const option = document.createElement('option');
                         option.value = team;
                         option.textContent = team;
-                        select.appendChild(option);
+                        championSelect.appendChild(option);
                     });
                 } else {
                     console.warn('Invalid team count for champion:', teams);
                 }
-                select.value = data.finals.champion || '';
+                championSelect.value = data.finals.champion || '';
+            } else {
+                console.error('Champion select element not found');
+            }
+            // Populate series length dropdown
+            const seriesLengthSelect = document.getElementById('seriesLength');
+            if (seriesLengthSelect) {
+                console.log('Populating seriesLength with options'); // Debug log
+                seriesLengthSelect.innerHTML = '<option value="" disabled selected>Select SERIES LENGTH</option>';
+                ['4-0', '4-1', '4-2', '4-3'].forEach(series => {
+                    const option = document.createElement('option');
+                    option.value = series;
+                    option.textContent = series;
+                    seriesLengthSelect.appendChild(option);
+                });
+                seriesLengthSelect.value = data.finals.seriesLength || '';
+            } else {
+                console.error('Series length select element not found');
             }
             // Set existing MVP and final score values
             document.getElementById('mvp').value = data.finals.mvp || '';
@@ -90,12 +106,13 @@ function submitFinals(event) {
     event.preventDefault();
     const formData = {
         champion: document.getElementById('champion')?.value || '',
+        seriesLength: document.getElementById('seriesLength')?.value || '',
         mvp: document.getElementById('mvp')?.value || '',
         finalScore: document.getElementById('finalScore')?.value || ''
     };
 
-    if (!formData.champion || !formData.mvp || !formData.finalScore) {
-        alert('Please select the champion, enter the MVP, and provide the final score.');
+    if (!formData.champion || !formData.seriesLength || !formData.mvp || !formData.finalScore) {
+        alert('Please select the champion, series length, enter the MVP, and provide the final score.');
         return;
     }
 

@@ -27,6 +27,16 @@
                 </select>
             </div>
             <div class="input-group">
+                <label for="seriesLength">Series Length:</label>
+                <select name="seriesLength" id="seriesLength">
+                    <option value="" disabled selected>Select SERIES LENGTH</option>
+                    <option value="4-0">4-0</option>
+                    <option value="4-1">4-1</option>
+                    <option value="4-2">4-2</option>
+                    <option value="4-3">4-3</option>
+                </select>
+            </div>
+            <div class="input-group">
                 <label for="mvp">MVP:</label>
                 <input type="text" name="mvp" id="mvp" placeholder="Enter MVP name">
             </div>
@@ -38,7 +48,7 @@
             <button type="submit">Submit</button>
         </form>
     </div>
-    <script src="/scripts/finals.js"></script>
+    <script src="/scripts/finals.js" defer></script>
 </body>
 </html>
 
@@ -51,7 +61,7 @@
         display: inline-block;
         width: 150px;
     }
-    .input-group input {
+    .input-group select, .input-group input {
         padding: 5px;
         font-size: 16px;
         width: 200px;
