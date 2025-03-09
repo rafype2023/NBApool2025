@@ -23,7 +23,7 @@ app.use(cors({
     origin: 'https://nbapool2025.onrender.com',
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
     preflightContinue: false,
     optionsSuccessStatus: 204
 }));
@@ -44,12 +44,12 @@ app.use(session({
         else console.log('MongoStore initialized');
     }),
     cookie: {
-        secure: true, // Explicitly set for HTTPS
+        secure: true,
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: 'none', // Required for cross-origin on Render
+        sameSite: 'none',
         path: '/',
-        domain: '.onrender.com' // Explicit domain for Render
+        domain: '.onrender.com'
     },
     proxy: true
 }));
@@ -64,6 +64,12 @@ app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - SessionID: ${req.sessionID}, UserId: ${req.session.userId}, Cookie: ${req.headers.cookie || 'none'}`);
     console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
     console.log('Session Object:', JSON.stringify(req.session, null, 2));
+    next();
+});
+
+// Security Headers (Optional)
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
     next();
 });
 
@@ -311,5 +317,6 @@ app.get('/logout', (req, res) => {
     });
 });
 
+// Ensure Render uses the correct port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
