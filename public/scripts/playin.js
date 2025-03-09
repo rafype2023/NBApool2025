@@ -3,10 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('/get-playin', {
         method: 'GET',
         credentials: 'include',
-        mode: 'cors',
-        headers: {
-            'X-Session-ID': document.cookie.split('; ').find(row => row.startsWith('connect.sid='))?.split('=')[1] || ''
-        }
+        mode: 'cors'
     })
         .then(response => {
             console.log('GET /get-playin response:', response.status, response.headers);
