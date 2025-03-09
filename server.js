@@ -9,7 +9,7 @@ const app = express();
 
 // MongoDB Connection
 const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/nbapool';
-mongoose.connect(mongoUrl, { useUnifiedTopology: true }) // Removed deprecated options
+mongoose.connect(mongoUrl, { useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected successfully'))
     .catch(err => console.error('MongoDB connection error:', err));
 
@@ -22,7 +22,7 @@ app.use(cors({
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    exposedHeaders: ['Set-Cookie'], // Expose Set-Cookie header
+    exposedHeaders: ['Set-Cookie'],
     preflightContinue: false,
     optionsSuccessStatus: 204
 }));
@@ -48,7 +48,7 @@ app.use(session({
         httpOnly: true,
         sameSite: 'none',
         path: '/',
-        domain: 'nbapool2025.onrender.com' // Specific domain instead of wildcard
+        domain: 'nbapool2025.onrender.com'
     },
     proxy: true
 }));
@@ -160,7 +160,198 @@ app.post('/submit-playin', async (req, res) => {
     }
 });
 
-// Add remaining routes (firstround-east, firstround-west, etc.) as previously provided
+app.get('/get-firstround-east', async (req, res) => {
+    console.log('Get First Round East request:', { 
+        sessionId: req.sessionID, 
+        userId: req.session.userId, 
+        session: req.session 
+    });
+    if (!req.session.userId) {
+        console.warn('Unauthorized access to /get-firstround-east - Session not found');
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            console.warn('User not found for ID:', req.session.userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        // Ensure default structure even if firstRoundEast is undefined
+        const defaultData = { matchup1: '', matchup2: '', matchup3: '', matchup4: '' };
+        const responseData = user.firstRoundEast ? { ...defaultData, ...user.firstRoundEast } : defaultData;
+        console.log('Returning First Round East data:', responseData);
+        res.json(responseData);
+    } catch (error) {
+        console.error('Error fetching First Round East data:', error);
+        res.status(500).json({ error: 'Server error fetching First Round East data' });
+    }
+});
+
+app.post('/submit-firstround-east', async (req, res) => {
+    console.log('Submit First Round East request:', { sessionId: req.sessionID, userId: req.session.userId, body: req.body });
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.session.userId,
+            { firstRoundEast: req.body.firstRoundEast },
+            { new: true, runValidators: true }
+        );
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json({ message: 'First Round East data saved successfully' });
+    } catch (error) {
+        console.error('Error saving First Round East data:', error);
+        res.status(500).json({ error: 'Server error saving First Round East data' });
+    }
+});
+
+app.get('/get-firstround-west', async (req, res) => {
+    console.log('Get First Round West request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    if (!req.session.userId) {
+        console.warn('Unauthorized access to /get-firstround-west - Session not found');
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json(user.firstRoundWest || {});
+    } catch (error) {
+        console.error('Error fetching First Round West data:', error);
+        res.status(500).json({ error: 'Server error fetching First Round West data' });
+    }
+});
+
+app.post('/submit-firstround-west', async (req, res) => {
+    console.log('Submit First Round West request:', { sessionId: req.sessionID, userId: req.session.userId, body: req.body });
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.session.userId,
+            { firstRoundWest: req.body.firstRoundWest },
+            { new: true, runValidators: true }
+        );
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json({ message: 'First Round West data saved successfully' });
+    } catch (error) {
+        console.error('Error saving First Round West data:', error);
+        res.status(500).json({ error: 'Server error saving First Round West data' });
+    }
+});
+
+app.get('/get-semifinals', async (req, res) => {
+    console.log('Get Semifinals request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    if (!req.session.userId) {
+        console.warn('Unauthorized access to /get-semifinals - Session not found');
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json(user.semifinals || {});
+    } catch (error) {
+        console.error('Error fetching Semifinals data:', error);
+        res.status(500).json({ error: 'Server error fetching Semifinals data' });
+    }
+});
+
+app.post('/submit-semifinals', async (req, res) => {
+    console.log('Submit Semifinals request:', { sessionId: req.sessionID, userId: req.session.userId, body: req.body });
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.session.userId,
+            { semifinals: req.body.semifinals },
+            { new: true, runValidators: true }
+        );
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json({ message: 'Semifinals data saved successfully' });
+    } catch (error) {
+        console.error('Error saving Semifinals data:', error);
+        res.status(500).json({ error: 'Server error saving Semifinals data' });
+    }
+});
+
+app.get('/get-conferencefinals', async (req, res) => {
+    console.log('Get Conference Finals request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    if (!req.session.userId) {
+        console.warn('Unauthorized access to /get-conferencefinals - Session not found');
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json(user.conferenceFinals || {});
+    } catch (error) {
+        console.error('Error fetching Conference Finals data:', error);
+        res.status(500).json({ error: 'Server error fetching Conference Finals data' });
+    }
+});
+
+app.post('/submit-conferencefinals', async (req, res) => {
+    console.log('Submit Conference Finals request:', { sessionId: req.sessionID, userId: req.session.userId, body: req.body });
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.session.userId,
+            { conferenceFinals: req.body.conferenceFinals },
+            { new: true, runValidators: true }
+        );
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json({ message: 'Conference Finals data saved successfully' });
+    } catch (error) {
+        console.error('Error saving Conference Finals data:', error);
+        res.status(500).json({ error: 'Server error saving Conference Finals data' });
+    }
+});
+
+app.post('/submit-finals', async (req, res) => {
+    console.log('Submit Finals request:', { sessionId: req.sessionID, userId: req.session.userId, body: req.body });
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.session.userId,
+            { finals: req.body.finals },
+            { new: true, runValidators: true }
+        );
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json({ message: 'Finals data saved successfully' });
+    } catch (error) {
+        console.error('Error saving Finals data:', error);
+        res.status(500).json({ error: 'Server error saving Finals data' });
+    }
+});
+
+app.get('/get-all-picks', async (req, res) => {
+    console.log('Get All Picks request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    if (!req.session.userId) {
+        console.warn('Unauthorized access to /get-all-picks - Session not found');
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json({
+            playin: user.playin || {},
+            firstRoundEast: user.firstRoundEast || {},
+            firstRoundWest: user.firstRoundWest || {},
+            semifinals: user.semifinals || {},
+            conferenceFinals: user.conferenceFinals || {},
+            finals: user.finals || {}
+        });
+    } catch (error) {
+        console.error('Error fetching all picks:', error);
+        res.status(500).json({ error: 'Server error fetching all picks' });
+    }
+});
 
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {

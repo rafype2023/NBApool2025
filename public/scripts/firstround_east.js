@@ -1,55 +1,54 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Play-In page loaded with Super Grok optimization');
-    fetch('/get-playin', {
+    console.log('First Round East page loaded with Super Grok optimization');
+    fetch('/get-firstround-east', {
         method: 'GET',
-        credentials: 'include', // Force sending session cookie
-        mode: 'cors' // Explicitly set CORS mode
+        credentials: 'include',
+        mode: 'cors'
     })
         .then(response => {
-            console.log('GET /get-playin response:', response.status, response.headers);
+            console.log('GET /get-firstround-east response:', response.status, response.headers);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then(data => {
-            console.log('Play-In data received:', data);
+            console.log('First Round East data received:', data);
             if (data.error) {
                 alert(`Error: ${data.error}. Redirecting to registration.`);
                 window.location.href = '/';
                 return;
             }
-            document.getElementById('east7').value = data.east7 || '';
-            document.getElementById('east8').value = data.east8 || '';
-            document.getElementById('west7').value = data.west7 || '';
-            document.getElementById('west8').value = data.west8 || '';
+            // Populate dropdowns
+            document.getElementById('matchup1').value = data.matchup1 || '';
+            document.getElementById('matchup2').value = data.matchup2 || '';
+            document.getElementById('matchup3').value = data.matchup3 || '';
+            document.getElementById('matchup4').value = data.matchup4 || '';
             populateDropdowns();
         })
         .catch(error => {
-            console.error('Fetch error for /get-playin:', error);
-            alert('Failed to load Play-In data. Please ensure you’re registered or contact support.');
-            populateDropdowns(); // Fallback to populate empty dropdowns
+            console.error('Fetch error for /get-firstround-east:', error);
+            alert('Failed to load First Round East data. Please ensure you’re registered or contact support.');
+            window.location.href = '/';
+            populateDropdowns();
         });
 
-    const playinForm = document.getElementById('playin-form');
-    if (!playinForm) {
-        console.error('Play-In form not found. Check if id="playin-form" exists.');
+    const firstRoundEastForm = document.getElementById('firstround-east-form');
+    if (!firstRoundEastForm) {
+        console.error('First Round East form not found. Check if id="firstround-east-form" exists.');
         alert('Form error. Refresh or contact support.');
         return;
     }
-    playinForm.addEventListener('submit', submitPlayin);
+    firstRoundEastForm.addEventListener('submit', submitFirstRoundEast);
 });
 
 function populateDropdowns() {
-    const eastTeams = ['Pistons', 'Magic', 'Wizards', 'Hawks'];
-    const westTeams = ['Rockets', 'Spurs', 'Trail Blazers', 'Jazz'];
-
-    ['east7', 'east8', 'west7', 'west8'].forEach(id => {
+    const teams = ['Bucks', 'Hawks', 'Celtics', 'Knicks', '7th Seed', '8th Seed', '6th Seed', 'Sixers'];
+    ['matchup1', 'matchup2', 'matchup3', 'matchup4'].forEach(id => {
         const select = document.getElementById(id);
         if (!select) {
             console.error(`Select element with id '${id}' not found`);
             return;
         }
-        select.innerHTML = ''; // Clear existing options
-        const teams = id.startsWith('east') ? eastTeams : westTeams;
+        select.innerHTML = '<option value="" disabled selected>Select WINNER</option>';
         teams.forEach(team => {
             const option = document.createElement('option');
             option.value = team;
@@ -59,38 +58,30 @@ function populateDropdowns() {
     });
 }
 
-function submitPlayin(event) {
+function submitFirstRoundEast(event) {
     event.preventDefault();
     const formData = {
-        east7: document.getElementById('east7').value,
-        east8: document.getElementById('east8').value,
-        west7: document.getElementById('west7').value,
-        west8: document.getElementById('west8').value
+        matchup1: document.getElementById('matchup1').value,
+        matchup2: document.getElementById('matchup2').value,
+        matchup3: document.getElementById('matchup3').value,
+        matchup4: document.getElementById('matchup4').value
     };
 
-    if (!formData.east7 || !formData.east8 || !formData.west7 || !formData.west8) {
-        alert('Please select all Play-In seeds.');
-        return;
-    }
-    if (formData.east7 === formData.east8) {
-        alert('Eastern Conference 7th and 8th seeds must be different teams.');
-        return;
-    }
-    if (formData.west7 === formData.west8) {
-        alert('Western Conference 7th and 8th seeds must be different teams.');
+    if (!formData.matchup1 || !formData.matchup2 || !formData.matchup3 || !formData.matchup4) {
+        alert('Please select all winners.');
         return;
     }
 
-    console.log('Submitting Play-In data:', formData);
-    fetch('/submit-playin', {
+    console.log('Submitting First Round East data:', formData);
+    fetch('/submit-firstround-east', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-        credentials: 'include', // Force sending session cookie
-        mode: 'cors' // Explicitly set CORS mode
+        body: JSON.stringify({ firstRoundEast: formData }),
+        credentials: 'include',
+        mode: 'cors'
     })
         .then(response => {
-            console.log('POST /submit-playin response:', response.status, response.headers);
+            console.log('POST /submit-firstround-east response:', response.status);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
@@ -98,12 +89,12 @@ function submitPlayin(event) {
             console.log('Submit response:', data);
             if (data.error) alert(`Error: ${data.error}`);
             else {
-                alert('Play-In data saved successfully!');
-                window.location.href = '/firstround_east.html';
+                alert('First Round East data saved successfully!');
+                window.location.href = '/firstround_west.html';
             }
         })
         .catch(error => {
-            console.error('Submit error for /submit-playin:', error);
-            alert('Failed to save Play-In data. Please try again or contact support.');
+            console.error('Submit error for /submit-firstround-east:', error);
+            alert('Failed to save First Round East data. Please try again or contact support.');
         });
 }
