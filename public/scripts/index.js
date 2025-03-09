@@ -1,6 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Index page loaded with Super Grok optimization');
-    const registerForm = document.getElementById('register-form');
+    let registerForm = document.getElementById('register-form');
+
+    // Retry if form is not found initially
+    if (!registerForm) {
+        console.warn('Register form not found initially. Retrying...');
+        setTimeout(() => {
+            registerForm = document.getElementById('register-form');
+            if (!registerForm) {
+                console.error('Register form still not found after retry. Check if id="register-form" exists in index.html.');
+                alert('Form error. Refresh or contact support.');
+                return;
+            }
+        }, 100); // Retry after 100ms
+    }
+
     if (!registerForm) {
         console.error('Register form not found. Check if id="register-form" exists.');
         alert('Form error. Refresh or contact support.');
@@ -19,46 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('An error occurred: Form fields are missing. Please refresh or contact support.');
         return;
     }
-
-    const userData = {
-        name: nameInput.value,
-        email: emailInput.value,
-        phone: phoneInput.value,
-        comments: commentsInput.value,
-        paymentMethod: paymentMethodSelect.value
-    };
-
-    console.log('Submitting registration:', userData);
-    fetch('/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(userData),
-        credentials: 'include' // Ensure cookies are sent
-    })
-        .then(response => {
-            console.log('Response from /register:', response.status, response.statusText);
-            if (!response.ok) {
-                return response.json().then(errData => {
-                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errData.error}`);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Registration response:', data);
-            if (data.error) {
-                alert('Error: ' + data.error);
-            } else {
-                alert('Registration successful!');
-                window.location.href = '/playin.html';
-            }
-        })
-        .catch(error => {
-            console.error('Fetch error for /register:', error);
-            alert('Failed to register. Please try again or contact support.');
-        });
 
     registerForm.addEventListener('submit', submitRegistration);
 });

@@ -4,50 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pool NBA 2025 - Registro</title>
-    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/style.css">
 </head>
 <body>
-    <div class="header">
-        <img src="/images/nba-pool-logo.png" alt="Pool NBA Logo" class="logo">
-        <h1>BIENVENIDOS AL <span>POOL NBA</span> 2025</h1>
-    </div>
-
     <div class="container">
-        <div class="rules">
-            <h3>Reglas de puntuación</h3>
-            <p>PRIMERA RONDA: 1 pt para el ganador, 1 pt para los juegos (máximo 2 por partido)</p>
-            <p>SEMIFINALES: 2 puntos para el ganador, 1 punto para los juegos (máximo 3 por enfrentamiento)</p>
-            <p>FINALES DE LA CONFERENCIA: 3 puntos para el ganador, 1 punto para los juegos (máximo 4 por partido)</p>
-            <p>FINALES: 4 puntos para el ganador, 3 puntos para los juegos, 1 punto para el MVP (máximo 8)</p>
-        </div>
-
+        <img src="/images/nba-pool-logo.png" alt="NBA Pool Logo" class="logo" loading="lazy">
+        <h1>BIENVENIDOS AL POOL NBA 2025</h1>
         <h2>REGISTRO</h2>
-        <form id="registration-form">
-            <div class="form-group">
-                <label for="name">Nombre:</label>
-                <input type="text" id="name" name="name" placeholder="Name" required autocomplete="name">
-                
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" placeholder="Email" required autocomplete="email">
-                
-                <label for="phone">Teléfono:</label>
-                <input type="tel" id="phone" name="phone" placeholder="Phone" required autocomplete="tel">
-                
-                <label for="comments">Comentarios (opcional):</label>
-                <input type="text" id="comments" name="comments" placeholder="Comments (optional)" autocomplete="off">
-                
-                <label for="paymentMethod">Método de Pago:</label>
-                <select id="paymentMethod" name="paymentMethod" required>
-                    <option value="" disabled selected>Selecciona el Método de Pago</option>
-                    <option value="ATH-Movil">ATH-Movil</option>
-                    <option value="Credit Card">Credit Card</option>
-                    <option value="Cash">Cash</option>
-                </select>
-            </div>
+        <p>Reglas de puntuación:</p>
+        <ul>
+            <li>PRIMERA RONDA: 1 pt para el ganador, 1 pt para los juegos (máximo 2 por partido)</li>
+            <li>SEMIFINALES: 2 puntos para el ganador, 1 pt para los juegos (máximo 3 por enfrentamiento)</li>
+            <li>CONFERENCIA: 3 puntos para el ganador, 1 punto para los juegos (máximo 4 por partido)</li>
+            <li>FINALES: 4 puntos para el ganador, 3 puntos para los juegos, 1 punto para el MVP (máximo 8)</li>
+        </ul>
+        <form id="register-form">
+            <label for="name">Nombre:</label><br>
+            <input type="text" id="name" name="name" required><br>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email" required><br>
+            <label for="phone">Teléfono:</label><br>
+            <input type="tel" id="phone" name="phone" required><br>
+            <label for="comments">Comentarios (opcional):</label><br>
+            <textarea id="comments" name="comments"></textarea><br>
+            <label for="paymentMethod">Método de Pago:</label><br>
+            <select id="paymentMethod" name="paymentMethod" required>
+                <option value="" disabled selected>Selecciona el Método de Pago</option>
+                <option value="ATH-Movil">ATH-Movil</option>
+                <option value="PayPal">PayPal</option>
+            </select><br>
             <button type="submit">Next</button>
         </form>
     </div>
-
-    <script src="/scripts/index.js" defer></script>
+    <script src="/scripts/index.js" defer></script> <!-- Use defer to ensure DOM is ready -->
 </body>
 </html>
