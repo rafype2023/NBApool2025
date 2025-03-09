@@ -1,28 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Registration page loaded');
-    const registrationForm = document.getElementById('registration-form');
-    if (!registrationForm) {
-        console.error('Registration form not found. Ensure the form has id="registration-form".');
-        alert('An error occurred: Registration form not found. Please refresh the page or contact support.');
+    console.log('Index page loaded with Super Grok optimization');
+    const registerForm = document.getElementById('register-form');
+    if (!registerForm) {
+        console.error('Register form not found. Check if id="register-form" exists.');
+        alert('Form error. Refresh or contact support.');
         return;
     }
 
-    registrationForm.addEventListener('submit', submitRegistration);
-});
-
-function submitRegistration(event) {
-    event.preventDefault();
-
+    // Check if all required elements exist
     const nameInput = document.getElementById('name');
     const emailInput = document.getElementById('email');
     const phoneInput = document.getElementById('phone');
     const commentsInput = document.getElementById('comments');
     const paymentMethodSelect = document.getElementById('paymentMethod');
 
-    // Check if all required elements exist
     if (!nameInput || !emailInput || !phoneInput || !paymentMethodSelect) {
-        console.error('One or more form fields are missing. Check IDs: name, email, phone, paymentMethod.');
-        alert('An error occurred: Form fields are missing. Please refresh the page or contact support.');
+        console.error('One or more form fields are missing. Check form inputs.');
+        alert('An error occurred: Form fields are missing. Please refresh or contact support.');
         return;
     }
 
@@ -30,37 +24,96 @@ function submitRegistration(event) {
         name: nameInput.value,
         email: emailInput.value,
         phone: phoneInput.value,
-        comments: commentsInput ? commentsInput.value : '',
+        comments: commentsInput.value,
         paymentMethod: paymentMethodSelect.value
     };
 
     console.log('Submitting registration:', userData);
-    fetch('/submit-registration', {
+    fetch('/register', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(userData),
         credentials: 'include' // Ensure cookies are sent
     })
-    .then(response => {
-        console.log('Fetch /submit-registration response status:', response.status);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
+        .then(response => {
+            console.log('Response from /register:', response.status, response.statusText);
+            if (!response.ok) {
+                return response.json().then(errData => {
+                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errData.error}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Registration response:', data);
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                alert('Registration successful!');
+                window.location.href = '/playin.html';
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error for /register:', error);
+            alert('Failed to register. Please try again or contact support.');
+        });
+
+    registerForm.addEventListener('submit', submitRegistration);
+});
+
+function submitRegistration(event) {
+    event.preventDefault();
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const commentsInput = document.getElementById('comments');
+    const paymentMethodSelect = document.getElementById('paymentMethod');
+
+    if (!nameInput || !emailInput || !phoneInput || !paymentMethodSelect) {
+        console.error('One or more form fields are missing. Check form inputs.');
+        alert('An error occurred: Form fields are missing. Please refresh or contact support.');
+        return;
+    }
+
+    const userData = {
+        name: nameInput.value,
+        email: emailInput.value,
+        phone: phoneInput.value,
+        comments: commentsInput.value,
+        paymentMethod: paymentMethodSelect.value
+    };
+
+    console.log('Submitting registration:', userData);
+    fetch('/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData),
+        credentials: 'include' // Ensure cookies are sent
     })
-    .then(data => {
-        console.log('Registration response:', data);
-        if (data.error) {
-            alert('Error: ' + data.error);
-        } else {
-            alert('Registration successful!');
-            window.location.href = '/playin.html';
-        }
-    })
-    .catch(error => {
-        console.error('Error submitting registration:', error);
-        alert('An error occurred while submitting the registration. Please try again or contact support.');
-    });
+        .then(response => {
+            console.log('Response from /register:', response.status, response.statusText);
+            if (!response.ok) {
+                return response.json().then(errData => {
+                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errData.error}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Registration response:', data);
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                alert('Registration successful!');
+                window.location.href = '/playin.html';
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error for /register:', error);
+            alert('Failed to register. Please try again or contact support.');
+        });
 }

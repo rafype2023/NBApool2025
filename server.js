@@ -11,14 +11,28 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session middleware
+// Session middleware with enhanced logging
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nba_pool' }),
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+    store: MongoStore.create({ 
+        mongoUrl: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nba_pool',
+        ttl: 24 * 60 * 60 // 1 day in seconds
+    }),
+    cookie: { 
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        secure: process.env.NODE_ENV === 'production', // Secure cookies in production
+        sameSite: 'lax'
+    }
 }));
+
+// Log session middleware setup
+app.use((req, res, next) => {
+    console.log('Session middleware - SessionID:', req.sessionID);
+    console.log('Session middleware - Session:', req.session);
+    next();
+});
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nba_pool', {
@@ -43,7 +57,7 @@ const userSchema = new mongoose.Schema({
         matchup2: String,
         matchup3: String,
         matchup4: String,
-        series1: String, // e.g., "4-0", "4-1"
+        series1: String,
         series2: String,
         series3: String,
         series4: String
@@ -77,7 +91,7 @@ const userSchema = new mongoose.Schema({
     finals: {
         champion: String,
         mvp: String,
-        finalScore: String // e.g., "120-115"
+        finalScore: String
     }
 });
 
@@ -118,18 +132,37 @@ app.get('/summary.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'summary.html'));
 });
 
-// Registration Route
+// Registration Route with enhanced debugging
 app.post('/register', async (req, res) => {
-    console.log('Register request:', req.body);
+    console.log('Register request received:', req.body);
+    console.log('Session before registration:', req.session);
     try {
         const { name, email, phone, comments, paymentMethod } = req.body;
+        if (!name || !email || !phone || !paymentMethod) {
+            console.warn('Missing required fields:', { name, email, phone, paymentMethod });
+            return res.status(400).json({ error: 'All fields except comments are required' });
+        }
+
+        // Create and save the user
         const user = new User({ name, email, phone, comments, paymentMethod });
-        await user.save();
-        req.session.userId = user._id;
-        console.log('User registered:', user);
-        res.json({ message: 'Registration successful', redirect: '/playin.html' });
+        const savedUser = await user.save();
+        console.log('User saved to database:', savedUser);
+
+        // Set session userId
+        req.session.userId = savedUser._id.toString();
+        console.log('Session after setting userId:', req.session);
+
+        // Verify session persistence
+        req.session.save(err => {
+            if (err) {
+                console.error('Error saving session:', err);
+                return res.status(500).json({ error: 'Failed to save session' });
+            }
+            console.log('Session saved successfully');
+            res.json({ message: 'Registration successful', redirect: '/playin.html' });
+        });
     } catch (error) {
-        console.error('Error registering user:', error);
+        console.error('Error during registration:', error);
         if (error.code === 11000) {
             res.status(400).json({ error: 'Email already exists' });
         } else {
