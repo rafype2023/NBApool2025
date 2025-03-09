@@ -23,7 +23,9 @@ app.use(cors({
     origin: 'https://nbapool2025.onrender.com',
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
 }));
 
 // Session Configuration
@@ -45,10 +47,11 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        sameSite: 'none', // Explicitly set for production
         path: '/',
         domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
-    }
+    },
+    proxy: true // Explicit proxy support
 }));
 
 // Middleware
@@ -59,7 +62,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Debug Headers
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - SessionID: ${req.sessionID}, UserId: ${req.session.userId}, Cookie: ${req.headers.cookie || 'none'}`);
-    console.log('Request Headers:', req.headers);
+    console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
+    console.log('Session Object:', JSON.stringify(req.session, null, 2));
     next();
 });
 
@@ -113,9 +117,9 @@ app.post('/submit-registration', async (req, res) => {
 });
 
 app.get('/get-playin', async (req, res) => {
-    console.log('Get Play-In request:', { sessionId: req.sessionID, userId: req.session.userId });
+    console.log('Get Play-In request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
     if (!req.session.userId) {
-        console.warn('Unauthorized access to /get-playin');
+        console.warn('Unauthorized access to /get-playin - Session not found');
         return res.status(401).json({ error: 'Unauthorized: Please register first' });
     }
     try {
