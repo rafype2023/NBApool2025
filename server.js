@@ -216,15 +216,38 @@ app.post('/submit-firstround-east', async (req, res) => {
 });
 
 app.get('/get-firstround-west', async (req, res) => {
-    console.log('Get First Round West request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    console.log('Get First Round West request:', { 
+        sessionId: req.sessionID, 
+        userId: req.session.userId, 
+        session: req.session 
+    });
+    console.log('Session Cookie from Request:', req.headers.cookie || 'none');
     if (!req.session.userId) {
         console.warn('Unauthorized access to /get-firstround-west - Session not found');
         return res.status(401).json({ error: 'Unauthorized: Please register first' });
     }
     try {
         const user = await User.findById(req.session.userId);
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json(user.firstRoundWest || {});
+        if (!user) {
+            console.warn('User not found for ID:', req.session.userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        // Check if Play-In step is completed
+        if (!user.playin || !user.playin.west7 || !user.playin.west8) {
+            console.warn('Play-In step not completed for user:', req.session.userId);
+            return res.status(400).json({ error: 'Please complete the Play-In step first' });
+        }
+        const defaultData = { matchup1: '', matchup2: '', matchup3: '', matchup4: '' };
+        const playinData = user.playin || { west7: '7th Seed', west8: '8th Seed' };
+        const responseData = {
+            firstRoundWest: user.firstRoundWest ? { ...defaultData, ...user.firstRoundWest } : defaultData,
+            playin: {
+                west7: playinData.west7 || '7th Seed',
+                west8: playinData.west8 || '8th Seed'
+            }
+        };
+        console.log('Returning First Round West data:', responseData);
+        res.json(responseData);
     } catch (error) {
         console.error('Error fetching First Round West data:', error);
         res.status(500).json({ error: 'Server error fetching First Round West data' });
