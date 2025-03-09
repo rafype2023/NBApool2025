@@ -186,7 +186,7 @@ app.get('/get-playin', async (req, res) => {
             console.warn('User not found for ID:', req.session.userId);
             return res.status(404).json({ error: 'User not found' });
         }
-        const responseData = { playin: user.playin || {} };
+        const responseData = { playin: user.playin || { east7: '', east8: '', west7: '', west8: '' } }; // Default structure
         console.log('Returning Play-In data:', responseData);
         res.json(responseData);
     } catch (error) {
@@ -203,8 +203,8 @@ app.post('/submit-playin', async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(
             req.session.userId,
-            { playin: req.body.playin },
-            { new: true, runValidators: true }
+            { playin: req.body.playin || { east7: '', east8: '', west7: '', west8: '' } }, // Ensure structure
+            { new: true, runValidators: true, runSettersOnQuery: true }
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
         console.log('Updated Play-In data for user:', user.playin);

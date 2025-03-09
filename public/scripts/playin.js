@@ -13,21 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             console.log('Play-In data received:', data);
             if (data.error) {
-                alert(`Error: ${data.error}. Redirecting to registration.`);
+                alert(`${data.error}. Contact support if the issue persists.`);
                 window.location.href = '/';
                 return;
             }
-            document.getElementById('east7').value = data.east7 || '';
-            document.getElementById('east8').value = data.east8 || '';
-            document.getElementById('west7').value = data.west7 || '';
-            document.getElementById('west8').value = data.west8 || '';
-            populateDropdowns();
+            // Populate dropdowns with existing data
+            document.getElementById('east7').value = data.playin.east7 || '';
+            document.getElementById('east8').value = data.playin.east8 || '';
+            document.getElementById('west7').value = data.playin.west7 || '';
+            document.getElementById('west8').value = data.playin.west8 || '';
         })
         .catch(error => {
             console.error('Fetch error for /get-playin:', error);
             alert('Failed to load Play-In data. Please ensure you’re registered or contact support.');
             window.location.href = '/';
-            populateDropdowns();
         });
 
     const playinForm = document.getElementById('playin-form');
@@ -39,46 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
     playinForm.addEventListener('submit', submitPlayin);
 });
 
-function populateDropdowns() {
-    const eastTeams = ['Pistons', 'Magic', 'Wizards', 'Hawks'];
-    const westTeams = ['Rockets', 'Spurs', 'Trail Blazers', 'Jazz'];
-
-    ['east7', 'east8', 'west7', 'west8'].forEach(id => {
-        const select = document.getElementById(id);
-        if (!select) {
-            console.error(`Select element with id '${id}' not found`);
-            return;
-        }
-        select.innerHTML = '<option value="" disabled selected>Select Seed</option>';
-        const teams = id.startsWith('east') ? eastTeams : westTeams;
-        teams.forEach(team => {
-            const option = document.createElement('option');
-            option.value = team;
-            option.textContent = team;
-            select.appendChild(option);
-        });
-    });
-}
-
 function submitPlayin(event) {
     event.preventDefault();
     const formData = {
-        east7: document.getElementById('east7').value,
-        east8: document.getElementById('east8').value,
-        west7: document.getElementById('west7').value,
-        west8: document.getElementById('west8').value
+        east7: document.getElementById('east7')?.value || '',
+        east8: document.getElementById('east8')?.value || '',
+        west7: document.getElementById('west7')?.value || '',
+        west8: document.getElementById('west8')?.value || ''
     };
 
     if (!formData.east7 || !formData.east8 || !formData.west7 || !formData.west8) {
-        alert('Please select all Play-In seeds.');
-        return;
-    }
-    if (formData.east7 === formData.east8) {
-        alert('Eastern Conference 7th and 8th seeds must be different teams.');
-        return;
-    }
-    if (formData.west7 === formData.west8) {
-        alert('Western Conference 7th and 8th seeds must be different teams.');
+        alert('Please select all Play-In winners.');
         return;
     }
 
@@ -86,7 +56,7 @@ function submitPlayin(event) {
     fetch('/submit-playin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ playin: formData }),
         credentials: 'include',
         mode: 'cors'
     })
