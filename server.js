@@ -260,7 +260,7 @@ app.post('/submit-firstround-east', async (req, res) => {
     }
 });
 
-// First Round West Routes
+// First Round West Routes (similar updates)
 app.get('/get-firstround-west', async (req, res) => {
     console.log('Get First Round West request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
     console.log('Session Cookie from Request:', req.headers.cookie || 'none');
@@ -330,8 +330,8 @@ app.get('/get-semifinals', async (req, res) => {
         const semifinalsData = user.semifinals ? { ...defaultData, ...user.semifinals } : defaultData;
         const responseData = {
             semifinals: semifinalsData,
-            firstRoundEast: user.firstRoundEast || {},
-            firstRoundWest: user.firstRoundWest || {}
+            firstRoundEast: user.firstRoundEast || defaultData,
+            firstRoundWest: user.firstRoundWest || defaultData
         };
         console.log('Returning Semifinals data:', responseData);
         res.json(responseData);

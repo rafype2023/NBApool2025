@@ -23,63 +23,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Boston': 'celtics.png',
                 'New York Knicks': 'knicks.png',
                 'Milwaukee': 'bucks.png',
-                'Magic': 'magic.png',
-                'Pistons': 'pistons.png',
+                'Atlanta': 'hawks.png',
+                'Miami': 'heat.png',
+                'Orlando': 'magic.png',
+                'Washington': 'wizards.png',
                 'Detroit': 'pistons.png',
                 'Indiana': 'pacers.png',
+                'New Orleans': 'pelicans.png',
+                'San Antonio': 'spurs.png',
+                'Houston': 'rockets.png',
+                'Utah': 'jazz.png',
                 'OKC': 'thunder.png',
                 'Denver': 'nuggets.png',
                 'Los Angeles': 'lakers.png',
                 'Memphis': 'grizzlies.png',
-                'Houston': 'rockets.png',
-                'Golden State': 'warriors.png',
-    'Atlanta': 'hawks.png',
-    'Miami': 'heat.png',
-    'Orlando': 'magic.png',
-    'Washington': 'wizards.png',
-    'Detroit': 'pistons.png',
-    'Indiana': 'pacers.png',
-    'New Orleans': 'pelicans.png',
-    'San Antonio': 'spurs.png',
-    'Houston': 'rockets.png',
-    'Utah': 'jazz.png'
-};
-    // Add more teams as needed
+                'Golden State': 'warriors.png'
             };
             // Set Eastern Conference Semifinals
             const eastMatchup1Team1 = data.firstRoundEast.matchup1 || 'Winner 1 vs 8';
             const eastMatchup1Team2 = data.firstRoundEast.matchup4 || 'Winner 4 vs 5';
             const eastMatchup2Team1 = data.firstRoundEast.matchup2 || 'Winner 2 vs 7';
             const eastMatchup2Team2 = data.firstRoundEast.matchup3 || 'Winner 3 vs 6';
-            document.getElementById('east1-team1').querySelector('span').textContent = eastMatchup1Team1;
-            document.getElementById('east1-team1').querySelector('img').src = `/images/${teamImages[eastMatchup1Team1] || 'placeholder.png'}`;
-            document.getElementById('east1-team1').querySelector('img').alt = eastMatchup1Team1;
-            document.getElementById('east1-team2').querySelector('span').textContent = eastMatchup1Team2;
-            document.getElementById('east1-team2').querySelector('img').src = `/images/${teamImages[eastMatchup1Team2] || 'placeholder.png'}`;
-            document.getElementById('east1-team2').querySelector('img').alt = eastMatchup1Team2;
-            document.getElementById('east2-team1').querySelector('span').textContent = eastMatchup2Team1;
-            document.getElementById('east2-team1').querySelector('img').src = `/images/${teamImages[eastMatchup2Team1] || 'placeholder.png'}`;
-            document.getElementById('east2-team1').querySelector('img').alt = eastMatchup2Team1;
-            document.getElementById('east2-team2').querySelector('span').textContent = eastMatchup2Team2;
-            document.getElementById('east2-team2').querySelector('img').src = `/images/${teamImages[eastMatchup2Team2] || 'placeholder.png'}`;
-            document.getElementById('east2-team2').querySelector('img').alt = eastMatchup2Team2;
             // Set Western Conference Semifinals
             const westMatchup1Team1 = data.firstRoundWest.matchup1 || 'Winner 1 vs 8';
             const westMatchup1Team2 = data.firstRoundWest.matchup4 || 'Winner 4 vs 5';
             const westMatchup2Team1 = data.firstRoundWest.matchup2 || 'Winner 2 vs 7';
             const westMatchup2Team2 = data.firstRoundWest.matchup3 || 'Winner 3 vs 6';
-            document.getElementById('west1-team1').querySelector('span').textContent = westMatchup1Team1;
-            document.getElementById('west1-team1').querySelector('img').src = `/images/${teamImages[westMatchup1Team1] || 'placeholder.png'}`;
-            document.getElementById('west1-team1').querySelector('img').alt = westMatchup1Team1;
-            document.getElementById('west1-team2').querySelector('span').textContent = westMatchup1Team2;
-            document.getElementById('west1-team2').querySelector('img').src = `/images/${teamImages[westMatchup1Team2] || 'placeholder.png'}`;
-            document.getElementById('west1-team2').querySelector('img').alt = westMatchup1Team2;
-            document.getElementById('west2-team1').querySelector('span').textContent = westMatchup2Team1;
-            document.getElementById('west2-team1').querySelector('img').src = `/images/${teamImages[westMatchup2Team1] || 'placeholder.png'}`;
-            document.getElementById('west2-team1').querySelector('img').alt = westMatchup2Team1;
-            document.getElementById('west2-team2').querySelector('span').textContent = westMatchup2Team2;
-            document.getElementById('west2-team2').querySelector('img').src = `/images/${teamImages[westMatchup2Team2] || 'placeholder.png'}`;
-            document.getElementById('west2-team2').querySelector('img').alt = westMatchup2Team2;
+            // Function to set team data with null checks
+            const setTeamData = (id, team) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    const span = element.querySelector('span');
+                    const img = element.querySelector('img');
+                    if (span) span.textContent = team;
+                    if (img) img.src = `/images/${teamImages[team] || 'placeholder.png'}`;
+                    if (img) img.alt = team;
+                } else {
+                    console.error(`Element with id '${id}' not found`);
+                }
+            };
+            // Set Eastern Conference teams
+            setTeamData('east1-team1', eastMatchup1Team1);
+            setTeamData('east1-team2', eastMatchup1Team2);
+            setTeamData('east2-team1', eastMatchup2Team1);
+            setTeamData('east2-team2', eastMatchup2Team2);
+            // Set Western Conference teams
+            setTeamData('west1-team1', westMatchup1Team1);
+            setTeamData('west1-team2', westMatchup1Team2);
+            setTeamData('west2-team1', westMatchup2Team1);
+            setTeamData('west2-team2', westMatchup2Team2);
             // Define matchups for dropdowns
             const matchups = {
                 east1: [eastMatchup1Team1, eastMatchup1Team2],
