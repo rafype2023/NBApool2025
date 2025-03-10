@@ -100,12 +100,13 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 //------
+/-----
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
-    service: 'gmail', // Or your email service
+    service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        user: process.env.EMAIL_USER || 'rafyperez@gmail.com',
+        pass: process.env.EMAIL_PASS || 'wdtvkhmlfjguyrsb'
     }
 });
 
