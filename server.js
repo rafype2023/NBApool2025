@@ -100,7 +100,7 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 //------
-/-----
+//-----
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
     service: 'gmail',
