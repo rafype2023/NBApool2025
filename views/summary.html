@@ -6,24 +6,13 @@
     <title>Pool NBA 2025 - Summary</title>
     <link rel="stylesheet" href="/styles/style.css">
     <style>
-        .summary-section {
-            margin: 20px 0;
-        }
-        .summary-section h3 {
-            color: #333;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 5px;
-        }
-        .summary-section p {
-            margin: 5px 0;
-        }
-        .summary-section ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .summary-section li {
-            margin: 5px 0;
-        }
+        .summary-section { margin: 20px 0; }
+        .summary-section h3 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+        .summary-section p { margin: 5px 0; }
+        .summary-section ul { list-style-type: none; padding: 0; }
+        .summary-section li { margin: 5px 0; }
+        .start-over-btn { margin-top: 20px; padding: 10px 20px; background-color: #f44336; color: white; border: none; cursor: pointer; }
+        .start-over-btn:hover { background-color: #d32f2f; }
     </style>
 </head>
 <body>
@@ -94,6 +83,7 @@
             </div>
         </div>
         <button onclick="window.location.href='/finals.html'">Previous</button>
+        <button class="start-over-btn" onclick="startOver()">Start Over</button>
     </div>
     <script src="/scripts/summary.js" defer></script>
 </body>

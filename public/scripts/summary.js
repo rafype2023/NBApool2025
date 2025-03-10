@@ -72,3 +72,29 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '/';
         });
 });
+
+// Start Over function
+function startOver() {
+    fetch('/start-over', {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'cors'
+    })
+        .then(response => {
+            console.log('POST /start-over response:', response.status);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Start-over response:', data);
+            if (data.error) alert(`Error: ${data.error}`);
+            else {
+                alert('Starting over! Redirecting to registration.');
+                window.location.href = data.redirect;
+            }
+        })
+        .catch(error => {
+            console.error('Start-over error:', error);
+            alert('Failed to start over. Please try again or contact support.');
+        });
+}

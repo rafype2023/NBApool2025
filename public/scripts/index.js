@@ -1,93 +1,132 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Index page loaded with Super Grok optimization');
-    let registerForm = document.getElementById('register-form');
+    console.log('Play-In page loaded with Super Grok optimization');
+    
+    // Define Play-In teams
+    const eastPlayinTeams = ['Atlanta', 'Miami', 'Orlando', 'Washington'];
+    const westPlayinTeams = ['New Orleans', 'San Antonio', 'Houston', 'Utah'];
 
-    // Retry if form is not found initially
-    if (!registerForm) {
-        console.warn('Register form not found initially. Retrying...');
-        setTimeout(() => {
-            registerForm = document.getElementById('register-form');
-            if (!registerForm) {
-                console.error('Register form still not found after retry. Check if id="register-form" exists in index.html.');
-                alert('Form error. Refresh or contact support.');
-                return;
-            }
-        }, 100); // Retry after 100ms
-    }
+    // Populate dropdowns with teams
+    const east7Select = document.getElementById('east7');
+    const east8Select = document.getElementById('east8');
+    const west7Select = document.getElementById('west7');
+    const west8Select = document.getElementById('west8');
 
-    if (!registerForm) {
-        console.error('Register form not found. Check if id="register-form" exists.');
+    if (!east7Select || !east8Select || !west7Select || !west8Select) {
+        console.error('One or more Play-In dropdowns not found. Check if ids exist.');
         alert('Form error. Refresh or contact support.');
         return;
     }
 
-    // Check if all required elements exist
-    const nameInput = document.getElementById('name');
-    const emailInput = document.getElementById('email');
-    const phoneInput = document.getElementById('phone');
-    const commentsInput = document.getElementById('comments');
-    const paymentMethodSelect = document.getElementById('paymentMethod');
+    // Populate Eastern Conference dropdowns
+    eastPlayinTeams.forEach(team => {
+        const option7 = document.createElement('option');
+        option7.value = team;
+        option7.textContent = team;
+        east7Select.appendChild(option7);
 
-    if (!nameInput || !emailInput || !phoneInput || !paymentMethodSelect) {
-        console.error('One or more form fields are missing. Check form inputs.');
-        alert('An error occurred: Form fields are missing. Please refresh or contact support.');
-        return;
-    }
+        const option8 = document.createElement('option');
+        option8.value = team;
+        option8.textContent = team;
+        east8Select.appendChild(option8);
+    });
 
-    registerForm.addEventListener('submit', submitRegistration);
-});
+    // Populate Western Conference dropdowns
+    westPlayinTeams.forEach(team => {
+        const option7 = document.createElement('option');
+        option7.value = team;
+        option7.textContent = team;
+        west7Select.appendChild(option7);
 
-function submitRegistration(event) {
-    event.preventDefault();
-    const nameInput = document.getElementById('name');
-    const emailInput = document.getElementById('email');
-    const phoneInput = document.getElementById('phone');
-    const commentsInput = document.getElementById('comments');
-    const paymentMethodSelect = document.getElementById('paymentMethod');
+        const option8 = document.createElement('option');
+        option8.value = team;
+        option8.textContent = team;
+        west8Select.appendChild(option8);
+    });
 
-    if (!nameInput || !emailInput || !phoneInput || !paymentMethodSelect) {
-        console.error('One or more form fields are missing. Check form inputs.');
-        alert('An error occurred: Form fields are missing. Please refresh or contact support.');
-        return;
-    }
-
-    const userData = {
-        name: nameInput.value,
-        email: emailInput.value,
-        phone: phoneInput.value,
-        comments: commentsInput.value,
-        paymentMethod: paymentMethodSelect.value
-    };
-
-    console.log('Submitting registration:', userData);
-    fetch('/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(userData),
-        credentials: 'include' // Ensure cookies are sent
+    // Fetch existing selections from the server
+    fetch('/get-playin', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors'
     })
         .then(response => {
-            console.log('Response from /register:', response.status, response.statusText);
-            if (!response.ok) {
-                return response.json().then(errData => {
-                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errData.error}`);
-                });
-            }
+            console.log('GET /get-playin response:', response.status, response.headers);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then(data => {
-            console.log('Registration response:', data);
+            console.log('Play-In data received:', data);
             if (data.error) {
-                alert('Error: ' + data.error);
-            } else {
-                alert('Registration successful!');
-                window.location.href = '/playin.html';
+                alert(`${data.error}. Contact support if the issue persists.`);
+                window.location.href = '/';
+                return;
+            }
+            east7Select.value = data.playin.east7 || '';
+            east8Select.value = data.playin.east8 || '';
+            west7Select.value = data.playin.west7 || '';
+            west8Select.value = data.playin.west8 || '';
+        })
+        .catch(error => {
+            console.error('Fetch error for /get-playin:', error);
+            alert('Failed to load Play-In data. Please ensure you’re registered or contact support.');
+            window.location.href = '/';
+        });
+
+    const playinForm = document.getElementById('playin-form');
+    if (!playinForm) {
+        console.error('Play-In form not found. Check if id="playin-form" exists.');
+        alert('Form error. Refresh or contact support.');
+        return;
+    }
+    playinForm.addEventListener('submit', submitPlayin);
+});
+
+function submitPlayin(event) {
+    event.preventDefault();
+    const formData = {
+        east7: document.getElementById('east7')?.value || '',
+        east8: document.getElementById('east8')?.value || '',
+        west7: document.getElementById('west7')?.value || '',
+        west8: document.getElementById('west8')?.value || ''
+    };
+
+    if (!formData.east7 || !formData.east8 || !formData.west7 || !formData.west8) {
+        alert('Please select all Play-In winners.');
+        return;
+    }
+
+    if (formData.east7 === formData.east8) {
+        alert('Eastern Conference 7th and 8th seeds must be different teams.');
+        return;
+    }
+    if (formData.west7 === formData.west8) {
+        alert('Western Conference 7th and 8th seeds must be different teams.');
+        return;
+    }
+
+    console.log('Submitting Play-In data:', formData);
+    fetch('/submit-playin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playin: formData }),
+        credentials: 'include',
+        mode: 'cors'
+    })
+        .then(response => {
+            console.log('POST /submit-playin response:', response.status);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Submit response:', data);
+            if (data.error) alert(`Error: ${data.error}`);
+            else {
+                alert('Play-In data saved successfully!');
+                window.location.href = '/firstround_east.html';
             }
         })
         .catch(error => {
-            console.error('Fetch error for /register:', error);
-            alert('Failed to register. Please try again or contact support.');
+            console.error('Submit error for /submit-playin:', error);
+            alert('Failed to save Play-In data. Please try again or contact support.');
         });
 }
