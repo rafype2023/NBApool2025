@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const path = require('path');
 const MongoStore = require('connect-mongo');
+const nodemailer = require('nodemailer');
 
 const app = express();
 
@@ -98,6 +99,156 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+//------
+// Nodemailer configuration
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Or your email service
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+// Routes (include existing routes, update these)
+
+app.get('/get-summary', async (req, res) => {
+    console.log('Get Summary request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    console.log('Session Cookie from Request:', req.headers.cookie || 'none');
+    if (!req.session.userId) {
+        console.warn('Unauthorized access to /get-summary - Session not found');
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            console.warn('User not found for ID:', req.session.userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        console.log('User data for summary:', user);
+        const responseData = {
+            personalData: {
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                comments: user.comments || '',
+                paymentMethod: user.paymentMethod || ''
+            },
+            selections: {
+                playin: user.playin || {},
+                firstRoundEast: user.firstRoundEast || {},
+                firstRoundWest: user.firstRoundWest || {},
+                semifinals: user.semifinals || {},
+                conferenceFinals: user.conferenceFinals || {},
+                finals: user.finals || {}
+            }
+        };
+        console.log('Returning Summary data:', responseData);
+        res.json(responseData);
+    } catch (error) {
+        console.error('Error fetching Summary data:', error);
+        res.status(500).json({ error: 'Server error fetching Summary data' });
+    }
+});
+
+app.post('/start-over', async (req, res) => {
+    console.log('Start Over request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Unauthorized: Please register first' });
+    }
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            console.warn('User not found for ID:', req.session.userId);
+            return res.status(404).json({ error: 'User not found' });
+        }
+        // Send email with full summary before resetting
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: 'NBA Pool 2025 - Your Selections Before Starting Over',
+            text: `
+                Dear ${user.name},
+
+                Here is a summary of your NBA Pool 2025 selections before starting over:
+
+                Personal Information:
+                - Name: ${user.name}
+                - Email: ${user.email}
+                - Phone: ${user.phone}
+                - Comments: ${user.comments || 'None'}
+                - Payment Method: ${user.paymentMethod}
+
+                Selections:
+                - Play-In:
+                    - East 7th Seed: ${user.playin?.east7 || 'Not selected'}
+                    - East 8th Seed: ${user.playin?.east8 || 'Not selected'}
+                    - West 7th Seed: ${user.playin?.west7 || 'Not selected'}
+                    - West 8th Seed: ${user.playin?.west8 || 'Not selected'}
+                - First Round East:
+                    - Matchup 1: ${user.firstRoundEast?.matchup1 || 'Not selected'}, Series: ${user.firstRoundEast?.series1 || 'Not selected'}
+                    - Matchup 2: ${user.firstRoundEast?.matchup2 || 'Not selected'}, Series: ${user.firstRoundEast?.series2 || 'Not selected'}
+                    - Matchup 3: ${user.firstRoundEast?.matchup3 || 'Not selected'}, Series: ${user.firstRoundEast?.series3 || 'Not selected'}
+                    - Matchup 4: ${user.firstRoundEast?.matchup4 || 'Not selected'}, Series: ${user.firstRoundEast?.series4 || 'Not selected'}
+                - First Round West:
+                    - Matchup 1: ${user.firstRoundWest?.matchup1 || 'Not selected'}, Series: ${user.firstRoundWest?.series1 || 'Not selected'}
+                    - Matchup 2: ${user.firstRoundWest?.matchup2 || 'Not selected'}, Series: ${user.firstRoundWest?.series2 || 'Not selected'}
+                    - Matchup 3: ${user.firstRoundWest?.matchup3 || 'Not selected'}, Series: ${user.firstRoundWest?.series3 || 'Not selected'}
+                    - Matchup 4: ${user.firstRoundWest?.matchup4 || 'Not selected'}, Series: ${user.firstRoundWest?.series4 || 'Not selected'}
+                - Semifinals:
+                    - East 1: ${user.semifinals?.east1 || 'Not selected'}, Series: ${user.semifinals?.eastSeries1 || 'Not selected'}
+                    - East 2: ${user.semifinals?.east2 || 'Not selected'}, Series: ${user.semifinals?.eastSeries2 || 'Not selected'}
+                    - West 1: ${user.semifinals?.west1 || 'Not selected'}, Series: ${user.semifinals?.westSeries1 || 'Not selected'}
+                    - West 2: ${user.semifinals?.west2 || 'Not selected'}, Series: ${user.semifinals?.westSeries2 || 'Not selected'}
+                - Conference Finals:
+                    - Eastern Conference: ${user.conferenceFinals?.eastWinner || 'Not selected'}, Series: ${user.conferenceFinals?.eastSeries || 'Not selected'}
+                    - Western Conference: ${user.conferenceFinals?.westWinner || 'Not selected'}, Series: ${user.conferenceFinals?.westSeries || 'Not selected'}
+                - Finals:
+                    - Champion: ${user.finals?.champion || 'Not selected'}
+                    - Series Length: ${user.finals?.seriesLength || 'Not selected'}
+                    - MVP: ${user.finals?.mvp || 'Not selected'}
+                    - Final Score: ${user.finals?.finalScore || 'Not selected'}
+
+                Your selections have been cleared, and you can now start over with a fresh set of predictions.
+
+                Thank you for participating!
+
+                Best,
+                NBA Pool 2025 Team
+            `
+        };
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending start-over email:', error);
+            } else {
+                console.log('Start-over email sent:', info.response);
+            }
+        });
+
+        // Reset user data (clear all selections, keep personal info)
+        user.playin = {};
+        user.firstRoundEast = {};
+        user.firstRoundWest = {};
+        user.semifinals = {};
+        user.conferenceFinals = {};
+        user.finals = {};
+        await user.save();
+        console.log('User data reset for:', user.email);
+
+        // Destroy session and redirect
+        req.session.destroy(err => {
+            if (err) {
+                console.error('Error destroying session:', err);
+                return res.status(500).json({ error: 'Server error resetting session' });
+            }
+            res.json({ message: 'Session reset, starting over', redirect: '/' });
+        });
+    } catch (error) {
+        console.error('Error in start-over:', error);
+        res.status(500).json({ error: 'Server error during start-over' });
+    }
+});
+
+//-------
 // Routes
 
 // Serve HTML pages
