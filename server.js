@@ -30,8 +30,10 @@ app.use(session({
     }),
     cookie: { 
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // 'none' in production for fetch requests
+        secure: false, // Temporarily disable secure for debugging
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' in production for fetch requests
+        path: '/', // Explicitly set path
+        domain: process.env.NODE_ENV === 'production' ? 'nbapool2025.onrender.com' : undefined // Explicitly set domain in production
     }
 }));
 
@@ -141,6 +143,9 @@ app.post('/register', async (req, res) => {
                 return res.status(500).json({ error: 'Error saving session' });
             }
             console.log('User registered, session updated:', req.session);
+            // Log the Set-Cookie header being sent
+            const setCookieHeader = res.get('Set-Cookie');
+            console.log('Set-Cookie Header in /register response:', setCookieHeader);
             res.json({ message: 'Registration successful', redirect: '/playin.html' });
         });
     } catch (error) {
