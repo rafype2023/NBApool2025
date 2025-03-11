@@ -23,14 +23,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     secret: process.env.SESSION_SECRET, // Rely on environment variable only
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true, // Temporarily set to true to force session saving
     store: MongoStore.create({ 
         mongoUrl: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nba_pool',
         ttl: 24 * 60 * 60 // 1 day in seconds
     }),
     cookie: { 
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        secure: process.env.NODE_ENV === 'production', // Re-enabled for production HTTPS
+        secure: process.env.NODE_ENV === 'production', // Enabled for production HTTPS
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' in production for fetch requests
         path: '/', // Explicitly set path
         domain: process.env.NODE_ENV === 'production' ? 'nbapool2025.onrender.com' : undefined // Explicitly set domain in production
@@ -143,11 +143,21 @@ app.post('/register', async (req, res) => {
                 return res.status(500).json({ error: 'Error saving session' });
             }
             console.log('User registered, session updated:', req.session);
+            // Explicitly set the connect.sid cookie
+            res.cookie('connect.sid', req.sessionID, {
+                maxAge: 24 * 60 * 60 * 1000, // 24 hours
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                path: '/',
+                domain: process.env.NODE_ENV === 'production' ? 'nbapool2025.onrender.com' : undefined,
+                httpOnly: true
+            });
             // Log the Set-Cookie header being sent
             const setCookieHeader = res.get('Set-Cookie');
             console.log('Set-Cookie Header in /register response:', setCookieHeader);
-            // Redirect to trigger cookie setting
-            res.redirect('/playin.html');
+            // Log all response headers
+            console.log('All Response Headers in /register:', res.getHeaders());
+            res.json({ message: 'Registration successful', redirect: '/playin.html' });
         });
     } catch (error) {
         console.error('Error registering user:', error);
