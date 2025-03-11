@@ -1,12 +1,12 @@
-document.addEventListener('listener', () => {
+document.addEventListener('DOMContentLoaded', () => {
     console.log('Index page loaded with Super Grok optimization');
     let registrationForm = document.getElementById('registration-form');
     if (!registrationForm) {
-        console.error('Register form not found initially. Retrying...');
+        console.error('Registration form not found initially. Retrying...');
         setTimeout(() => {
             registrationForm = document.getElementById('registration-form');
             if (!registrationForm) {
-                console.error('Register form still not found after retry. Check if id="registration-form" exists in index.html');
+                console.error('Registration form still not found after retry. Check if id="registration-form" exists in index.html');
                 alert('Form error. Refresh or contact support.');
                 return;
             }
@@ -22,7 +22,8 @@ document.addEventListener('listener', () => {
 });
 
 function submitRegistration(event) {
-    event.preventDefault();
+    event.preventDefault(); // Ensure this prevents the default form submission
+    console.log('Form submitted, preventing default behavior');
     const nameInput = document.getElementById('name');
     const emailInput = document.getElementById('email');
     const phoneInput = document.getElementById('phone');
@@ -30,7 +31,7 @@ function submitRegistration(event) {
     const paymentMethodSelect = document.getElementById('paymentMethod');
 
     if (!nameInput || !emailInput || !phoneInput || !paymentMethodSelect) {
-        console.error('One or more form fields are missing. Check form inputs.');
+        console.error('One or more form fields are missing. Check form inputs:', { nameInput, emailInput, phoneInput, paymentMethodSelect });
         alert('An error occurred: Form fields are missing. Please refresh or contact support.');
         return;
     }
@@ -44,6 +45,7 @@ function submitRegistration(event) {
     };
 
     if (!formData.name || !formData.email || !formData.phone || !formData.paymentMethod) {
+        console.log('Validation failed, missing required fields:', formData);
         alert('Please fill in all required fields (Name, Email, Phone, Payment Method).');
         return;
     }
@@ -57,7 +59,7 @@ function submitRegistration(event) {
         mode: 'cors'
     })
         .then(response => {
-            console.log('POST /register response:', response.status);
+            console.log('POST /register response:', response.status, response);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
@@ -66,7 +68,7 @@ function submitRegistration(event) {
             if (data.error) alert(`Error: ${data.error}`);
             else {
                 alert('Registration successful!');
-                window.location.href = data.redirect;
+                window.location.href = data.redirect; // Redirect to playin.html
             }
         })
         .catch(error => {
