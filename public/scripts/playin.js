@@ -44,10 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Fetch existing selections from the server
-    fetch('/get-playin', {
+    fetch('https://nbapool2025.onrender.com/get-playin', {
         method: 'GET',
-        credentials: 'include',
-        mode: 'cors'
+        credentials: 'include'
     })
         .then(response => {
             console.log('GET /get-playin response:', response.status, response.headers);
