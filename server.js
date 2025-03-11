@@ -7,7 +7,14 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 
-// Middleware
+// Middleware to force HTTPS in production
+app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production') {
+        return res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -24,7 +31,7 @@ app.use(session({
     cookie: { 
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // 'none' in production for fetch requests
     }
 }));
 
