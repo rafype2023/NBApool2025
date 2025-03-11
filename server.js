@@ -78,6 +78,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+app.get('/playin.html', (req, res) => {
+    console.log('Serving playin.html - Session:', req.session);
+    res.sendFile(path.join(__dirname, 'views', 'playin.html'));
+});
+
 // Registration Route
 app.post('/register', async (req, res) => {
     console.log('Register request:', req.body);
