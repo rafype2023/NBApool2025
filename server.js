@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: process.env.SESSION_SECRET, // Rely on environment variable only
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ 
@@ -31,6 +31,7 @@ app.use(session({
 app.use((req, res, next) => {
     console.log('Session middleware - SessionID:', req.sessionID);
     console.log('Session middleware - Session:', req.session);
+    console.log('Request Headers - Cookie:', req.headers.cookie); // Log incoming cookie
     next();
 });
 
@@ -147,6 +148,7 @@ app.post('/register', async (req, res) => {
 
 // Play-In Routes
 app.get('/get-playin', async (req, res) => {
+    console.log('Cookies received:', req.headers.cookie); // Log incoming cookie
     console.log('Get Play-In request:', { sessionId: req.sessionID, userId: req.session.userId, session: req.session });
     if (!req.session.userId) {
         console.warn('Unauthorized access to /get-playin - Session not found');
@@ -534,7 +536,7 @@ app.post('/start-over', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
