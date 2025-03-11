@@ -15,6 +15,12 @@ app.use((req, res, next) => {
     next();
 });
 
+// Add security headers
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -23,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     secret: process.env.SESSION_SECRET, // Rely on environment variable only
     resave: false,
-    saveUninitialized: true, // Temporarily set to true to force session saving
+    saveUninitialized: true, // Force session saving
     store: MongoStore.create({ 
         mongoUrl: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nba_pool',
         ttl: 24 * 60 * 60 // 1 day in seconds
@@ -31,9 +37,8 @@ app.use(session({
     cookie: { 
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         secure: process.env.NODE_ENV === 'production', // Enabled for production HTTPS
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' in production for fetch requests
+        sameSite: 'lax', // Test with Lax instead of None
         path: '/', // Explicitly set path
-        domain: process.env.NODE_ENV === 'production' ? 'nbapool2025.onrender.com' : undefined // Explicitly set domain in production
     }
 }));
 
@@ -147,9 +152,8 @@ app.post('/register', async (req, res) => {
             res.cookie('connect.sid', req.sessionID, {
                 maxAge: 24 * 60 * 60 * 1000, // 24 hours
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                sameSite: 'lax', // Test with Lax instead of None
                 path: '/',
-                domain: process.env.NODE_ENV === 'production' ? 'nbapool2025.onrender.com' : undefined,
                 httpOnly: true
             });
             // Log the Set-Cookie header being sent

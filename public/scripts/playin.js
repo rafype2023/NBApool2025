@@ -46,11 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch existing selections from the server
     fetch('https://nbapool2025.onrender.com/get-playin', {
         method: 'GET',
-        credentials: 'include'
+        credentials: 'include' // Ensure cookies are sent
     })
         .then(response => {
-            console.log('GET /get-playin response:', response.status, response.headers);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            console.log('GET /get-playin response:', {
+                status: response.status,
+                headers: Object.fromEntries(response.headers),
+                redirected: response.redirected,
+                url: response.url
+            });
+            if (!response.ok) {
+                if (response.status >= 300 && response.status < 400) {
+                    console.warn('Redirect detected:', response.url);
+                    window.location.href = response.url; // Follow redirect manually
+                    return;
+                }
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
@@ -111,12 +123,24 @@ function submitPlayin(event) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playin: formData }),
-        credentials: 'include',
-        mode: 'cors'
+        credentials: 'include' // Ensure cookies are sent
+        // Removed mode: 'cors' since it's same-origin
     })
         .then(response => {
-            console.log('POST /submit-playin response:', response.status);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            console.log('POST /submit-playin response:', {
+                status: response.status,
+                headers: Object.fromEntries(response.headers),
+                redirected: response.redirected,
+                url: response.url
+            });
+            if (!response.ok) {
+                if (response.status >= 300 && response.status < 400) {
+                    console.warn('Redirect detected:', response.url);
+                    window.location.href = response.url; // Follow redirect manually
+                    return;
+                }
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
