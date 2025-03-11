@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => {
             console.log('GET /get-playin response:', {
                 status: response.status,
-                headers: Object.fromEntries(response.headers),
+                headers: JSON.stringify(Object.fromEntries(response.headers)), // Safely stringify headers
                 redirected: response.redirected,
                 url: response.url
             });
@@ -124,12 +124,11 @@ function submitPlayin(event) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playin: formData }),
         credentials: 'include' // Ensure cookies are sent
-        // Removed mode: 'cors' since it's same-origin
     })
         .then(response => {
             console.log('POST /submit-playin response:', {
                 status: response.status,
-                headers: Object.fromEntries(response.headers),
+                headers: JSON.stringify(Object.fromEntries(response.headers)), // Safely stringify headers
                 redirected: response.redirected,
                 url: response.url
             });
