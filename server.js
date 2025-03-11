@@ -30,7 +30,7 @@ app.use(session({
     }),
     cookie: { 
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        secure: false, // Temporarily disable secure for debugging
+        secure: process.env.NODE_ENV === 'production', // Re-enabled for production HTTPS
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' in production for fetch requests
         path: '/', // Explicitly set path
         domain: process.env.NODE_ENV === 'production' ? 'nbapool2025.onrender.com' : undefined // Explicitly set domain in production
@@ -146,7 +146,8 @@ app.post('/register', async (req, res) => {
             // Log the Set-Cookie header being sent
             const setCookieHeader = res.get('Set-Cookie');
             console.log('Set-Cookie Header in /register response:', setCookieHeader);
-            res.json({ message: 'Registration successful', redirect: '/playin.html' });
+            // Redirect to trigger cookie setting
+            res.redirect('/playin.html');
         });
     } catch (error) {
         console.error('Error registering user:', error);
