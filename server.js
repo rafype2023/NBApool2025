@@ -72,7 +72,7 @@ const transporter = nodemailer.createTransport({
 
 // Routes
 
-// Serve index.html for root
+// Serve HTML files from views directory
 app.get('/', (req, res) => {
     console.log('Serving index.html - Session:', req.session);
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
@@ -81,6 +81,36 @@ app.get('/', (req, res) => {
 app.get('/playin.html', (req, res) => {
     console.log('Serving playin.html - Session:', req.session);
     res.sendFile(path.join(__dirname, 'views', 'playin.html'));
+});
+
+app.get('/firstround_east.html', (req, res) => {
+    console.log('Serving firstround_east.html - Session:', req.session);
+    res.sendFile(path.join(__dirname, 'views', 'firstround_east.html'));
+});
+
+app.get('/firstround_west.html', (req, res) => {
+    console.log('Serving firstround_west.html - Session:', req.session);
+    res.sendFile(path.join(__dirname, 'views', 'firstround_west.html'));
+});
+
+app.get('/semifinals.html', (req, res) => {
+    console.log('Serving semifinals.html - Session:', req.session);
+    res.sendFile(path.join(__dirname, 'views', 'semifinals.html'));
+});
+
+app.get('/conferencefinals.html', (req, res) => {
+    console.log('Serving conferencefinals.html - Session:', req.session);
+    res.sendFile(path.join(__dirname, 'views', 'conferencefinals.html'));
+});
+
+app.get('/finals.html', (req, res) => {
+    console.log('Serving finals.html - Session:', req.session);
+    res.sendFile(path.join(__dirname, 'views', 'finals.html'));
+});
+
+app.get('/summary.html', (req, res) => {
+    console.log('Serving summary.html - Session:', req.session);
+    res.sendFile(path.join(__dirname, 'views', 'summary.html'));
 });
 
 // Registration Route
@@ -150,7 +180,7 @@ app.post('/submit-playin', async (req, res) => {
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
         console.log('Updated Play-In data for user:', user.playin);
-        res.json({ message: 'Play-In data saved successfully' });
+        res.json({ message: 'Play-In data saved successfully', redirect: '/firstround_east.html' });
     } catch (error) {
         console.error('Error saving Play-In data:', error);
         res.status(500).json({ error: 'Server error saving Play-In data' });
@@ -167,10 +197,10 @@ app.get('/get-firstround-east', async (req, res) => {
         const user = await User.findById(req.session.userId);
         if (!user) return res.status(404).json({ error: 'User not found' });
         const defaultData = { matchup1: '', matchup2: '', matchup3: '', matchup4: '', series1: '', series2: '', series3: '', series4: '' };
-        const playinData = user.playin || { east7: '7th Seed', east8: '8th Seed' };
+        const playinData = user.playin || { east7: '', east8: '' };
         const responseData = {
             firstRoundEast: user.firstRoundEast ? { ...defaultData, ...user.firstRoundEast } : defaultData,
-            playin: { east7: playinData.east7 || '7th Seed', east8: playinData.east8 || '8th Seed' }
+            playin: playinData
         };
         console.log('Returning First Round East data:', responseData);
         res.json(responseData);
@@ -193,7 +223,7 @@ app.post('/submit-firstround-east', async (req, res) => {
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
         console.log('Updated First Round East data for user:', user.firstRoundEast);
-        res.json({ message: 'First Round East data saved successfully' });
+        res.json({ message: 'First Round East data saved successfully', redirect: '/firstround_west.html' });
     } catch (error) {
         console.error('Error saving First Round East data:', error);
         res.status(500).json({ error: 'Server error saving First Round East data' });
@@ -210,10 +240,10 @@ app.get('/get-firstround-west', async (req, res) => {
         const user = await User.findById(req.session.userId);
         if (!user) return res.status(404).json({ error: 'User not found' });
         const defaultData = { matchup1: '', matchup2: '', matchup3: '', matchup4: '', series1: '', series2: '', series3: '', series4: '' };
-        const playinData = user.playin || { west7: '7th Seed', west8: '8th Seed' };
+        const playinData = user.playin || { west7: '', west8: '' };
         const responseData = {
             firstRoundWest: user.firstRoundWest ? { ...defaultData, ...user.firstRoundWest } : defaultData,
-            playin: { west7: playinData.west7 || '7th Seed', west8: playinData.west8 || '8th Seed' }
+            playin: playinData
         };
         console.log('Returning First Round West data:', responseData);
         res.json(responseData);
@@ -236,7 +266,7 @@ app.post('/submit-firstround-west', async (req, res) => {
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
         console.log('Updated First Round West data for user:', user.firstRoundWest);
-        res.json({ message: 'First Round West data saved successfully' });
+        res.json({ message: 'First Round West data saved successfully', redirect: '/semifinals.html' });
     } catch (error) {
         console.error('Error saving First Round West data:', error);
         res.status(500).json({ error: 'Server error saving First Round West data' });
@@ -279,7 +309,7 @@ app.post('/submit-semifinals', async (req, res) => {
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
         console.log('Updated Semifinals data for user:', user.semifinals);
-        res.json({ message: 'Semifinals data saved successfully' });
+        res.json({ message: 'Semifinals data saved successfully', redirect: '/conferencefinals.html' });
     } catch (error) {
         console.error('Error saving Semifinals data:', error);
         res.status(500).json({ error: 'Server error saving Semifinals data' });
@@ -321,7 +351,7 @@ app.post('/submit-conferencefinals', async (req, res) => {
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
         console.log('Updated Conference Finals data for user:', user.conferenceFinals);
-        res.json({ message: 'Conference Finals data saved successfully' });
+        res.json({ message: 'Conference Finals data saved successfully', redirect: '/finals.html' });
     } catch (error) {
         console.error('Error saving Conference Finals data:', error);
         res.status(500).json({ error: 'Server error saving Conference Finals data' });
@@ -364,7 +394,7 @@ app.post('/submit-finals', async (req, res) => {
         );
         if (!user) return res.status(404).json({ error: 'User not found' });
         console.log('Updated Finals data for user:', user.finals);
-        res.json({ message: 'Finals data saved successfully' });
+        res.json({ message: 'Finals data saved successfully', redirect: '/summary.html' });
     } catch (error) {
         console.error('Error saving Finals data:', error);
         res.status(500).json({ error: 'Server error saving Finals data' });
@@ -467,8 +497,6 @@ app.post('/start-over', async (req, res) => {
                     - Final Score: ${user.finals?.finalScore || 'Not selected'}
 
                 Your selections have been cleared, and you can now start over with a fresh set of predictions.
-
-                Thank you for participating!
 
                 Best,
                 NBA Pool 2025 Team
